@@ -1,0 +1,35 @@
+{
+  "name": "saasfinder-segment",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "test": "vitest",
+    "check:types": "tsc --noEmit"
+  },
+  "eslintConfig": {
+    "rules": {
+      "semi": [
+        "error",
+        "never"
+      ]
+    }
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20230814.0",
+    "@types/lodash": "^4.14.197",
+    "@types/uuid": "^9.0.2",
+    "typescript": "^5.1.6",
+    "vitest": "^0.34.2",
+    "wrangler": "^3.5.1"
+  },
+  "dependencies": {
+    "@maccman/web-auth-library": "^1.0.5",
+    "cloudflare-basics": "^0.0.7",
+    "lodash": "^4.17.21",
+    "uuid": "^9.0.0",
+    "web-auth-library": "^1.0.3",
+    "zod": "^3.22.1"
+  }
+}
