@@ -1,7 +1,7 @@
 export async function RouteIndex() {
   return new Response(
     `
-    <h1>saasfinder-segment</h1>
+    <h1>onepipe</h1>
 
     <p>
       This is a <a href="https://developers.cloudflare.com/workers/">Cloudflare Worker</a> that receives Segment events and sends them to <a href="https://cloud.google.com/bigquery">BigQuery</a>.
@@ -20,8 +20,8 @@ export async function RouteIndex() {
   `,
     {
       headers: {
-        'Content-Type': 'text/html',
+        "Content-Type": "text/html",
       },
     }
-  )
+  );
 }

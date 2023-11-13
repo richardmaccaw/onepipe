@@ -1,11 +1,11 @@
-name = "saasfinder-segment"
+name = "onepipe"
 main = "src/worker.ts"
 compatibility_date = "2023-05-20"
 
 # # KV Namespace binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/kv
 [[kv_namespaces]]
 binding = "GOOGLE_TOKENS"
-id = "ff08cc734e2d429a8a35652e0eea32ea"
+id = "898595e9fa034c73aaeab91370fab18d"
 preview_id = "40fbdf8a347a4043868616b8f238bc9e"
 
 # # Durable Object binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/durable-objects
@@ -27,11 +27,11 @@ preview_id = "40fbdf8a347a4043868616b8f238bc9e"
 
 # # Queue binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/queues
 [[queues.producers]]
-queue = "saasfinder-segment-queue"
+queue = "onepipe-queue"
 binding = "QUEUE"
 
 [[queues.consumers]]
- queue = "saasfinder-segment-queue"
+ queue = "onepipe-queue"
  max_batch_size = 10 # optional: defaults to 10
  max_batch_timeout = 5 # optional: defaults to 5 seconds
 

@@ -46,7 +46,7 @@ Tests can be run using vitest. Run `pnpm test` to execute your tests.
 - [] Run `wrangler secret put BIGQUERY_DATASET_ID` to set the dataset ID
 - [] Run `wrangler secret put GOOGLE_CLOUD_CREDENTIALS` to set the Google Cloud credentials
 - [] Run `wrangler kv:namespace create "GOOGLE_TOKENS"` to create a KV namespace and update `wrangler.toml` with the namespace ID
-- [] Run `wrangler queues create saasfinder-segment-queue` to create a queue and update `wrangler.toml` with the queue ID
+- [] Run `wrangler queues create onepipe-queue` to create a queue and update `wrangler.toml` with the queue ID
 - [] Run `wrangler publish` to publish the worker
 
 ## Recording events
@@ -54,20 +54,20 @@ Tests can be run using vitest. Run `pnpm test` to execute your tests.
 The worker respects the same endpoint as Segment's HTTP API. You can use the following code to send events to the worker:
 
 ```typescript
-fetch('/t', {
-  method: 'POST',
+fetch("/t", {
+  method: "POST",
   body: JSON.stringify({
-    type: 'track',
-    userId: '123',
-    event: 'my_test_event',
-    anonymousId: '000-000-000',
-    properties: { my_property: 'test' },
+    type: "track",
+    userId: "123",
+    event: "my_test_event",
+    anonymousId: "000-000-000",
+    properties: { my_property: "test" },
   }),
-  headers: { 'Content-Type': 'application/json' },
+  headers: { "Content-Type": "application/json" },
 })
   .then((response) => response.json())
   .then((data) => console.log(data))
-  .catch((error) => console.error('Error:', error))
+  .catch((error) => console.error("Error:", error));
 ```
 
 See [Segment's documentation](https://segment-docs.netlify.app/docs/connections/spec/track/) for more information.
@@ -78,15 +78,15 @@ The Beacon API is a browser API that allows you to send data to a server without
 
 ```typescript
 navigator.sendBeacon(
-  '/t',
+  "/t",
   JSON.stringify({
-    type: 'track',
-    userId: '123',
-    event: 'my_test_event',
-    anonymousId: '000-000-000',
-    properties: { my_property: 'test' },
+    type: "track",
+    userId: "123",
+    event: "my_test_event",
+    anonymousId: "000-000-000",
+    properties: { my_property: "test" },
   })
-)
+);
 ```
 
 ## Useful Links
