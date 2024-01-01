@@ -22,7 +22,7 @@
     "@types/uuid": "^9.0.2",
     "typescript": "^5.1.6",
     "vitest": "^0.34.2",
-    "wrangler": "^3.5.1"
+    "wrangler": "^3.22.1"
   },
   "dependencies": {
     "@maccman/web-auth-library": "^1.0.5",
