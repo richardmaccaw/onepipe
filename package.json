@@ -7,14 +7,6 @@
     "dev": "wrangler dev",
     "check:types": "tsc --noEmit"
   },
-  "eslintConfig": {
-    "rules": {
-      "semi": [
-        "error",
-        "never"
-      ]
-    }
-  },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250408.0",
     "@types/lodash": "^4.17.16",
