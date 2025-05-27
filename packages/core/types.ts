@@ -30,7 +30,6 @@ const baseEventSchema = z.object({
   properties: z.record(z.any()).optional(),
 })
 
-// https://segment.com/docs/connections/spec/track/
 export const trackEventSchema = baseEventSchema.merge(
   z.object({
     event: z.string(),
@@ -40,7 +39,6 @@ export const trackEventSchema = baseEventSchema.merge(
 
 export type TrackEvent = z.infer<typeof trackEventSchema>
 
-// https://segment.com/docs/connections/spec/page/
 export const pageEventSchema = baseEventSchema.merge(
   z.object({
     type: z.enum(['page']),
@@ -51,7 +49,6 @@ export const pageEventSchema = baseEventSchema.merge(
 
 export type PageEvent = z.infer<typeof pageEventSchema>
 
-// https://segment.com/docs/connections/spec/identify/
 export const identifyEventSchema = baseEventSchema.merge(
   z.object({
     type: z.enum(['identify']),
@@ -82,6 +79,4 @@ export interface TrackQueueMessage {
   event: TrackSystemEvent
 }
 
-export type QueueMessage = IdentifyQueueMessage | TrackQueueMessage
-
-export * from '../packages/core/types'
+export type QueueMessage = IdentifyQueueMessage | TrackQueueMessage 

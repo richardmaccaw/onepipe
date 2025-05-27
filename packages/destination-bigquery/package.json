@@ -1,0 +1,13 @@
+{
+  "name": "@onepipe/destination-bigquery",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "@onepipe/core": "*"
+  }
+} 

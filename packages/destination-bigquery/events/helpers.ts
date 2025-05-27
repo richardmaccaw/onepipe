@@ -1,9 +1,9 @@
 import mapKeys from 'lodash/mapKeys'
 import omit from 'lodash/omit'
 import snakeCase from 'lodash/snakeCase'
-import { ensureTableAndSchema } from '../../lib/clients/bigquery'
-import { BigQueryConnectOptions, BigQueryEvent } from '../../lib/clients/bigquery/types'
-import { sleep } from '../../lib/sleep'
+import { ensureTableAndSchema } from '../lib/schema'
+import { BigQueryConnectOptions, BigQueryEvent } from '../lib/types'
+import { sleep } from '@onepipe/core'
 
 function safeEnsureTableAndSchema(event: BigQueryEvent, options: BigQueryConnectOptions) {
   try {
@@ -77,4 +77,4 @@ function flattenRecord(record: Record<string, any>, path: string[] = []): Record
       return { ...acc, [newKey]: value }
     }
   }, {})
-}
+} 

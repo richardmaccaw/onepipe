@@ -1,5 +1,5 @@
-import { Env } from '../../env'
 import { getAccessToken } from '@maccman/web-auth-library/google'
+import type { Env } from '@onepipe/core'
 
 // Generate a short lived access token from the service account key credentials
 
@@ -22,4 +22,4 @@ export async function getCachedAccessTokenForEnv(env: Env): Promise<string> {
   await env.GOOGLE_TOKENS.put('access_token', accessToken, { expirationTtl: 3600 })
 
   return accessToken
-}
+} 

@@ -100,4 +100,4 @@ function deriveColumnType(value: any): 'STRING' | 'FLOAT' | 'INTEGER' | 'TIMESTA
   }
 
   return 'STRING'
-}
+} 

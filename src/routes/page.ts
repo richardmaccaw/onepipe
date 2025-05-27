@@ -1,17 +1,13 @@
 import { withZod } from 'cloudflare-basics/middleware/zod-validation'
 import { v4 as uuid } from 'uuid'
-import { Env } from '../env'
+import type { Env } from '@onepipe/core'
 import {
   PageEvent,
-  PageSystemEvent,
-  SystemEventDecoration,
-  TrackEvent,
   TrackSystemEvent,
   pageEventSchema,
-  trackEventSchema,
-} from '../types'
-import { bigquery_handleTrack } from '../events/bigquery/track'
-import { json } from '../lib/response'
+} from '@onepipe/core'
+
+import { json } from '@onepipe/core'
 
 export const RoutePage = withZod<Env, PageEvent>(pageEventSchema, async ({ data, env }) => {
   const timestamp = new Date()

@@ -43,6 +43,12 @@ importers:
         specifier: ^4.13.2
         version: 4.13.2(@cloudflare/workers-types@4.20250408.0)
 
+  packages/destination-bigquery:
+    dependencies:
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+
 packages:
 
   '@cloudflare/kv-asset-handler@0.4.0':

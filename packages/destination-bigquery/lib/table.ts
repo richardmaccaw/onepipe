@@ -52,4 +52,4 @@ export async function insertEvents(events: BigQueryEvent[], options: BigQueryCon
   if (insertResponse.insertErrors?.length) {
     throw new Error(`Failed to insert event: ${JSON.stringify(insertResponse.insertErrors)}`)
   }
-}
+} 

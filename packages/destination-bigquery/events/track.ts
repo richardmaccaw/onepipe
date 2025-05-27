@@ -1,10 +1,10 @@
-import snakeCase from 'lodash/snakeCase'
-import { insertEvents } from '../../lib/clients/bigquery'
-import { Env } from '../../env'
-import { TrackSystemEvent } from '../../types'
-import { getCachedAccessTokenForEnv } from '../../lib/clients/google'
+
+import { insertEvents } from '../lib/table'
+import type { Env } from '@onepipe/core'
+import { TrackSystemEvent } from '@onepipe/core'
+import { getCachedAccessTokenForEnv } from '../lib/google'
 import { normalizeEvent, normalizeTableId, withCatchEnsureTableSchema } from './helpers'
-import { BigQueryConnectOptions } from '../../lib/clients/bigquery/types'
+import { BigQueryConnectOptions } from '../lib/types'
 
 export async function bigquery_handleTrack(event: TrackSystemEvent, env: Env) {
   const tableId = normalizeTableId(event.event)
@@ -30,4 +30,4 @@ export async function bigquery_handleTrack(event: TrackSystemEvent, env: Env) {
     normalizedEvent,
     options
   )
-}
+} 

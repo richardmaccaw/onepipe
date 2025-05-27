@@ -1,5 +1,5 @@
 import { Router } from 'cloudflare-basics'
-import { Env } from './env'
+import type { Env } from '@onepipe/core'
 import { RouteTrack } from './routes/track'
 import { RouteIndex } from './routes'
 import { CorsRoute } from './routes/cors'
