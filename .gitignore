@@ -31,3 +31,4 @@ node_modules
 # Cloudflare
 .wrangler
 .dev.vars
+.env
