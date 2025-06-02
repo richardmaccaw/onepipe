@@ -1,13 +1,22 @@
 {
   "name": "@onepipe/destination-bigquery",
-  "version": "0.1.0",
+  "version": "0.0.1",
+  "description": "OnePipe BigQuery destination plugin for data pipeline integration",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "lodash": "^4.17.21",
     "@onepipe/core": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
   }
 } 
