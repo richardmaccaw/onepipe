@@ -1,6 +1,6 @@
 import { withZod } from 'cloudflare-basics/middleware/zod-validation'
 import { v4 as uuid } from 'uuid'
-import type { Env } from '@onepipe/core'
+import type { Env } from '../types'
 import { json } from '@onepipe/core'
 
 import { IdentifyEvent, IdentifySystemEvent, identifyEventSchema } from '@onepipe/core'

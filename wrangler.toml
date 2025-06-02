@@ -4,7 +4,7 @@ compatibility_date = "2023-05-20"
 
 # # KV Namespace binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/kv
 [[kv_namespaces]]
-  binding = "GOOGLE_TOKENS"
+  binding = "TOKEN_CACHE"
   id = "ff34d1109f1340a9bed0fd859a42b45b"
   preview_id = "ff34d1109f1340a9bed0fd859a42b45b"
 
