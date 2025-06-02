@@ -14,7 +14,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "types": ["@cloudflare/workers-types"]
   },
   "include": [
     "**/*.ts",
