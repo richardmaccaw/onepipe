@@ -43,11 +43,37 @@ importers:
         specifier: ^4.13.2
         version: 4.13.2(@cloudflare/workers-types@4.20250408.0)
 
-  packages/destination-bigquery:
+  packages/client:
+    dependencies:
+      '@onepipe/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+
+  packages/core:
     dependencies:
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
+
+  packages/destination-bigquery:
+    dependencies:
+      '@onepipe/core':
+        specifier: workspace:*
+        version: link:../core
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
 
 packages:
 

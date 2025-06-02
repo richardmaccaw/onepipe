@@ -6,7 +6,7 @@ import { CorsRoute } from './routes/cors'
 import { RouteIdentify } from './routes/identify'
 import { RoutePage } from './routes/page'
 import { QueueMessage } from './types'
-import { safeConsumeMessage } from '@onepipe/core'
+import { safeConsumeMessage } from './queue/consumer'
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {

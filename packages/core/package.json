@@ -1,11 +1,23 @@
 {
   "name": "@onepipe/core",
   "version": "0.0.1",
-  "main": "index.ts",
-  "types": "index.ts",
-  "private": true,
+  "description": "OnePipe core types and utilities",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
   "dependencies": {
     "zod": "^3.24.2",
     "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250408.0",
+    "typescript": "^5.8.3"
   }
 } 

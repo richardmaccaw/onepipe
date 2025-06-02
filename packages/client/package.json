@@ -13,7 +13,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@onepipe/core": "*"
+    "@onepipe/core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.8.3"
@@ -24,4 +24,4 @@
     "segment",
     "onepipe"
   ]
-} 
+}

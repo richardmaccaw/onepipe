@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.21",
-    "@onepipe/core": "*"
+    "@onepipe/core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.8.3"
