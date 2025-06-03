@@ -28,12 +28,15 @@ compatibility_date = "2023-05-20"
 # # Queue binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/queues
 [[queues.producers]]
 queue = "onepipe-queue"
-binding = "QUEUE"
+binding = "onepipe_queue"
 
 [[queues.consumers]]
  queue = "onepipe-queue"
  max_batch_size = 10 # optional: defaults to 10
  max_batch_timeout = 5 # optional: defaults to 5 seconds
+
+[observability.logs]
+enabled = true
 
 # [env.production]
 # MY_VARIABLE = "production_value"
