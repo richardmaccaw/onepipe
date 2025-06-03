@@ -13,7 +13,7 @@
     "dev:client": "pnpm --filter @onepipe/client run dev"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250408.0",
+    "@cloudflare/workers-types": "^4.20250603.0",
     "@types/lodash": "^4.17.16",
     "@types/uuid": "^10.0.0",
     "typescript": "^5.8.3",
