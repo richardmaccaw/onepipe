@@ -10,14 +10,16 @@
     "build:client": "pnpm --filter @onepipe/client run build",
     "build:core": "pnpm --filter @onepipe/core run build",
     "build:destination-bigquery": "pnpm --filter @onepipe/destination-bigquery run build",
-    "dev:client": "pnpm --filter @onepipe/client run dev"
+    "dev:client": "pnpm --filter @onepipe/client run dev",
+    "test": "vitest"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250603.0",
     "@types/lodash": "^4.17.16",
     "@types/uuid": "^10.0.0",
     "typescript": "^5.8.3",
-    "wrangler": "^4.13.2"
+    "wrangler": "^4.13.2",
+    "vitest": "^1.5.0"
   },
   "dependencies": {
     "@maccman/web-auth-library": "^1.0.5",
