@@ -93,3 +93,24 @@ navigator.sendBeacon(
 
 - https://segment.com/docs/connections/storage/warehouses/schema/
 - https://developers.cloudflare.com/queues/get-started/#related-resources
+
+## Versioning
+
+This repository uses [Changesets](https://github.com/changesets/changesets) to manage versions for all packages in the workspace. After making changes to a package, run:
+
+```bash
+pnpm run changeset
+```
+
+Follow the prompts to describe your changes. To update package versions locally, run:
+
+```bash
+pnpm run version-packages
+```
+
+Publishing can then be performed with:
+
+```bash
+pnpm run release
+```
+
