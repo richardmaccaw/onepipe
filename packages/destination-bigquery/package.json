@@ -1,5 +1,6 @@
 {
   "name": "@onepipe/destination-bigquery",
+  "type": "module",
   "version": "0.0.1",
   "description": "OnePipe BigQuery destination plugin for data pipeline integration",
   "main": "dist/index.js",

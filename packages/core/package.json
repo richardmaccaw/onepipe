@@ -1,5 +1,6 @@
 {
   "name": "@onepipe/core",
+  "type": "module",
   "version": "0.0.1",
   "description": "OnePipe core types and utilities",
   "main": "dist/index.js",
@@ -20,4 +21,4 @@
     "@cloudflare/workers-types": "^4.20250603.0",
     "typescript": "^5.8.3"
   }
-} 
+}
