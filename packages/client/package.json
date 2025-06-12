@@ -1,5 +1,6 @@
 {
   "name": "@onepipe/client",
+  "type": "module",
   "version": "0.0.1",
   "description": "OnePipe client SDK for browser and Node.js",
   "main": "dist/index.js",

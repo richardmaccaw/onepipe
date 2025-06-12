@@ -1,5 +1,6 @@
 {
   "name": "@onepipe/destination-bigquery",
+  "type": "module",
   "version": "0.0.1",
   "description": "OnePipe BigQuery destination plugin for data pipeline integration",
   "main": "dist/index.js",
@@ -13,10 +14,11 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
+    "@maccman/web-auth-library": "^1.0.5",
     "lodash": "^4.17.21",
     "@onepipe/core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.8.3"
   }
-} 
+}

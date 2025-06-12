@@ -71,6 +71,9 @@ importers:
 
   packages/destination-bigquery:
     dependencies:
+      '@maccman/web-auth-library':
+        specifier: ^1.0.5
+        version: 1.0.5
       '@onepipe/core':
         specifier: workspace:*
         version: link:../core
