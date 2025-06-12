@@ -1,0 +1,3 @@
+{
+  "destinations": ["@onepipe/destination-bigquery"]
+}
