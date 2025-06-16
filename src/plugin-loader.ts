@@ -1,69 +1,61 @@
 import type { Env, TrackSystemEvent, IdentifySystemEvent, PageSystemEvent } from './types'
 import type { DestinationPlugin, DestinationPluginInstance } from '@onepipe/core'
-import config from '../onepipe.config.json'
+import defaultConfig from '../onepipe.config.json'
 
 class PluginManager {
-  private static instance: PluginManager;
   private plugins: DestinationPluginInstance[] | null = null;
+  private config: any;
 
-  private constructor() {}
-
-  public static getInstance(): PluginManager {
-    if (!PluginManager.instance) {
-      PluginManager.instance = new PluginManager();
-    }
-    return PluginManager.instance;
+  constructor(config: any = defaultConfig) {
+    this.config = config;
   }
 
   public async initPlugins(env: Env): Promise<DestinationPluginInstance[]> {
     if (this.plugins) {
       return this.plugins;
     }
-
     this.plugins = await Promise.all(
-      config.destinations.map(async (name: string) => {
+      this.config.destinations.map(async (name: string) => {
         const mod = await import(name);
         const plugin = mod.default as DestinationPlugin;
         return plugin.setup(env);
       })
     );
-
     return this.plugins;
   }
 }
 
-async function withPlugins<T>(env: Env, fn: (plugins: DestinationPluginInstance[]) => Promise<T>): Promise<T> {
-  const pluginManager = PluginManager.getInstance();
-  const plugins = await pluginManager.initPlugins(env);
+async function withPlugins<T>(
+  env: Env,
+  fn: (plugins: DestinationPluginInstance[]) => Promise<T>,
+  manager: PluginManager
+): Promise<T> {
+  const plugins = await manager.initPlugins(env);
   return fn(plugins);
 }
 
-export async function triggerTrack(event: TrackSystemEvent, env: Env) {
-  return withPlugins(env, async (plugins) => {
-    for (const plugin of plugins) {
-      if (plugin.track) {
-        await plugin.track(event)
-      }
-    }
-  })
+export function createPluginTriggers(config: any = defaultConfig) {
+  const manager = new PluginManager(config);
+  return {
+    triggerTrack: async (event: TrackSystemEvent, env: Env) =>
+      withPlugins(env, async (plugins) => {
+        for (const plugin of plugins) {
+          if (plugin.track) await plugin.track(event);
+        }
+      }, manager),
+    triggerIdentify: async (event: IdentifySystemEvent, env: Env) =>
+      withPlugins(env, async (plugins) => {
+        for (const plugin of plugins) {
+          if (plugin.identify) await plugin.identify(event);
+        }
+      }, manager),
+    triggerPage: async (event: PageSystemEvent, env: Env) =>
+      withPlugins(env, async (plugins) => {
+        for (const plugin of plugins) {
+          if (plugin.page) await plugin.page(event);
+        }
+      }, manager),
+  };
 }
 
-export async function triggerIdentify(event: IdentifySystemEvent, env: Env) {
-  return withPlugins(env, async (plugins) => {
-    for (const plugin of plugins) {
-      if (plugin.identify) {
-        await plugin.identify(event)
-      }
-    }
-  })
-}
-
-export async function triggerPage(event: PageSystemEvent, env: Env) {
-  return withPlugins(env, async (plugins) => {
-    for (const plugin of plugins) {
-      if (plugin.page) {
-        await plugin.page(event)
-      }
-    }
-  })
-}
+export const { triggerTrack, triggerIdentify, triggerPage } = createPluginTriggers();
