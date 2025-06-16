@@ -1,8 +1,7 @@
 import type { Env } from '../types'
-import { createBigQueryEnv } from '../types'
 import type { IdentifySystemEvent, TrackSystemEvent } from '@onepipe/core'
 import type { QueueMessage } from '../types'
-import { bigquery_handleIdentify, bigquery_handleTrack } from '@onepipe/destination-bigquery'
+import { triggerIdentify, triggerTrack } from '../plugin-loader'
 
 export async function safeConsumeMessage(message: Message<QueueMessage>, env: Env) {
   try {
@@ -26,9 +25,10 @@ function consumeMessage(message: Message<QueueMessage>, env: Env) {
 }
 
 function handleIdentify(event: IdentifySystemEvent, env: Env) {
-  return bigquery_handleIdentify(event, createBigQueryEnv(env))
+  return triggerIdentify(event, env)
 }
 
 function handleTrack(event: TrackSystemEvent, env: Env) {
-  return bigquery_handleTrack(event, createBigQueryEnv(env))
-} 
+  return triggerTrack(event, env)
+}
+

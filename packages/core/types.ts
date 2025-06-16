@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { Env } from './env'
 
 export const contextSchema = z.object({
   library: z
@@ -79,4 +80,15 @@ export interface TrackQueueMessage {
   event: TrackSystemEvent
 }
 
-export type QueueMessage = IdentifyQueueMessage | TrackQueueMessage 
+export type QueueMessage = IdentifyQueueMessage | TrackQueueMessage
+
+export interface DestinationPluginInstance {
+  identify?(event: IdentifySystemEvent): Promise<void>
+  track?(event: TrackSystemEvent): Promise<void>
+  page?(event: PageSystemEvent): Promise<void>
+}
+
+export interface DestinationPlugin {
+  name: string
+  setup(env: Env): DestinationPluginInstance
+}

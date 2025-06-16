@@ -29,7 +29,7 @@ The worker requires several environment variables to be set:
 - `GOOGLE_CLOUD_CREDENTIALS`: Your Google Cloud credentials.
   Deployment
 
-The worker can be deployed using Cloudflare's wrangler CLI. Run `npm run deploy` to publish your worker.
+The worker can be deployed using Cloudflare's wrangler CLI. Run `pnpm run deploy` to publish your worker.
 Development
 
 To start a development server, run `pnpm dev`. This will start a local server at http://localhost:8787/ where you can interact with your worker.
