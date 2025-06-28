@@ -1,6 +1,6 @@
 import type { Env, TrackSystemEvent, IdentifySystemEvent, PageSystemEvent } from './types'
 import type { DestinationPlugin, DestinationPluginInstance } from '@onepipe/core'
-import defaultConfig from '../onepipe.config.json'
+import defaultConfig from '../../../onepipe.config.json'
 
 class PluginManager {
   private plugins: DestinationPluginInstance[] | null = null;

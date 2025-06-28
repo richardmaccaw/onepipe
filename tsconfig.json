@@ -31,6 +31,7 @@
     "paths": {
       "@onepipe/destination-bigquery": ["packages/destination-bigquery"],
       "@onepipe/core": ["packages/core"],
+      "@onepipe/worker": ["packages/worker"]
     },
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like `./node_modules/@types`. */
@@ -104,11 +105,13 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
   "include": [
-    "src/**/*"
+    "packages/worker/src/**/*"
   ],
   "exclude": [
     "node_modules",
     "packages/client/**/*",
+    "packages/core/**/*",
+    "packages/destination-bigquery/**/*",
     "dist",
     ".wrangler"
   ]
