@@ -2,6 +2,14 @@ import type { Env, TrackSystemEvent, IdentifySystemEvent, PageSystemEvent } from
 import type { DestinationPlugin, DestinationPluginInstance } from '@onepipe/core'
 import defaultConfig from '../../../onepipe.config.json'
 
+// Plugin registry with lazy dynamic imports
+const PLUGIN_REGISTRY: Record<string, () => Promise<DestinationPlugin>> = {
+  '@onepipe/destination-bigquery': async () => {
+    const { destinationBigQuery } = await import('@onepipe/destination-bigquery')
+    return destinationBigQuery
+  },
+}
+
 class PluginManager {
   private plugins: DestinationPluginInstance[] | null = null;
   private config: any;
@@ -16,8 +24,11 @@ class PluginManager {
     }
     this.plugins = await Promise.all(
       this.config.destinations.map(async (name: string) => {
-        const mod = await import(name);
-        const plugin = mod.default as DestinationPlugin;
+        const pluginLoader = PLUGIN_REGISTRY[name];
+        if (!pluginLoader) {
+          throw new Error(`Plugin "${name}" not found in registry`);
+        }
+        const plugin = await pluginLoader();
         return plugin.setup(env);
       })
     );
