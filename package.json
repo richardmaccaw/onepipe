@@ -9,9 +9,7 @@
     "check:types": "tsc --noEmit",
     "build": "pnpm -r run build",
     "build:core": "pnpm --filter @onepipe/core run build",
-    "build:worker": "pnpm --filter @onepipe/worker run build",
-    "build:destination-bigquery": "pnpm --filter @onepipe/destination-bigquery run build",
-    "dev:worker": "pnpm --filter @onepipe/worker run dev"
+    "build:destination-bigquery": "pnpm --filter @onepipe/destination-bigquery run build"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250603.0",
@@ -21,6 +19,8 @@
     "wrangler": "^4.13.2"
   },
   "dependencies": {
+    "@onepipe/core": "workspace:*",
+    "@onepipe/destination-bigquery": "workspace:*",
     "@maccman/web-auth-library": "^1.0.5",
     "cloudflare-basics": "^0.0.9",
     "lodash": "^4.17.21",

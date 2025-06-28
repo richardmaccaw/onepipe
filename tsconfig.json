@@ -30,8 +30,7 @@
     "baseUrl": ".",
     "paths": {
       "@onepipe/destination-bigquery": ["packages/destination-bigquery"],
-      "@onepipe/core": ["packages/core"],
-      "@onepipe/worker": ["packages/worker"]
+      "@onepipe/core": ["packages/core"]
     },
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like `./node_modules/@types`. */
@@ -105,7 +104,7 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
   "include": [
-    "packages/worker/src/**/*"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",
