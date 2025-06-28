@@ -109,7 +109,6 @@
   ],
   "exclude": [
     "node_modules",
-    "packages/client/**/*",
     "packages/core/**/*",
     "packages/destination-bigquery/**/*",
     "dist",

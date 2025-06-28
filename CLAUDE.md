@@ -11,7 +11,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Building
 - `pnpm build` - Build all packages in workspace
-- `pnpm build:client` - Build only the client SDK package
 - `pnpm build:core` - Build only the core package
 - `pnpm build:worker` - Build only the worker package
 - `pnpm build:destination-bigquery` - Build only the BigQuery destination package
@@ -22,7 +21,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `wrangler kv:namespace create "GOOGLE_TOKENS"` - Create KV namespace for token caching
 
 ### Package Development
-- `pnpm dev:client` - Start client package in development mode
 - `pnpm dev:worker` - Start worker package in development mode
 - `pnpm --filter @onepipe/[package-name] [command]` - Run commands on specific packages
 
@@ -59,10 +57,6 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 - Main worker entry point and HTTP routing
 - Plugin loading system and queue processing
 - Route handlers for track, identify, and page events
-
-**`@onepipe/client`** - Browser/Node SDK:
-- Drop-in replacement for Segment SDK
-- TypeScript support with automatic context enrichment
 
 **`@onepipe/destination-bigquery`** - BigQuery plugin:
 - Auto-creates tables and schemas
@@ -119,9 +113,8 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 1. **Plugin Development**: Create in `packages/destination-[name]/`
 2. **Core Changes**: Modify types in `@onepipe/core` package
 3. **Worker Changes**: Modify routing/logic in `@onepipe/worker` package
-4. **Client Changes**: Update SDK in `@onepipe/client` package
-5. **Testing**: Use `pnpm dev` with local requests to test endpoints
-6. **Deployment**: Use `pnpm run deploy` for production deployment
+4. **Testing**: Use `pnpm dev` with local requests to test endpoints
+5. **Deployment**: Use `pnpm run deploy` for production deployment
 
 ### API Compatibility
 

@@ -8,11 +8,9 @@
     "dev": "wrangler dev",
     "check:types": "tsc --noEmit",
     "build": "pnpm -r run build",
-    "build:client": "pnpm --filter @onepipe/client run build",
     "build:core": "pnpm --filter @onepipe/core run build",
     "build:worker": "pnpm --filter @onepipe/worker run build",
     "build:destination-bigquery": "pnpm --filter @onepipe/destination-bigquery run build",
-    "dev:client": "pnpm --filter @onepipe/client run dev",
     "dev:worker": "pnpm --filter @onepipe/worker run dev"
   },
   "devDependencies": {
