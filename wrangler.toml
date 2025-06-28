@@ -39,17 +39,18 @@ binding = "QUEUE"
 enabled = true
 
 # Environment configurations
+# Environment variables are managed via .env files:
+# .env (local development)
+# .env.staging (staging environment)  
+# .env.production (production environment)
+
 [env.staging]
 name = "onepipe-staging"
-BIGQUERY_PROJECT_ID = "my-staging-project"
-BIGQUERY_DATASET_ID = "analytics_staging"
 
 [env.production]
 name = "onepipe-production"
-BIGQUERY_PROJECT_ID = "my-production-project"
-BIGQUERY_DATASET_ID = "analytics_production"
 
-# Secrets (sensitive values) should still use wrangler secret put:
+# Secrets (sensitive values) should use wrangler secret put:
 # wrangler secret put GOOGLE_CLOUD_CREDENTIALS --env staging
 # wrangler secret put GOOGLE_CLOUD_CREDENTIALS --env production
 
