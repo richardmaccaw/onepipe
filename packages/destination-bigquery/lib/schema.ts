@@ -1,4 +1,5 @@
-import { BigQueryEvent, BigQueryConnectOptions, BigQuerySchemaField, baseUrl } from './types'
+import type { BigQueryEvent, BigQueryConnectOptions, BigQuerySchemaField } from './types'
+import { baseUrl } from './types'
 
 export async function ensureTableAndSchema(event: BigQueryEvent, options: BigQueryConnectOptions) {
   const schema = deriveSchema(event)

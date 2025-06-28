@@ -1,6 +1,8 @@
 import type { Cache, Env } from '@onepipe/core'
 import { createNamespacedCache } from '@onepipe/core'
-import { BigQueryEnv } from './types'
+import type { BigQueryEnv } from './types'
+
+export type { BigQueryEnv }
 
 
 export function createBigQueryEnv(

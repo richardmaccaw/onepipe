@@ -2,7 +2,7 @@ import type { DestinationPlugin, Env } from '@onepipe/core'
 import { bigquery_handleIdentify } from './events/identify'
 import { bigquery_handleTrack } from './events/track'
 import { createBigQueryEnv } from './lib/env'
-import { BigQueryEnv } from 'lib/types'
+import { BigQueryEnv } from './lib/types'
 
 export const destinationBigQuery: DestinationPlugin = {
   name: '@onepipe/destination-bigquery',

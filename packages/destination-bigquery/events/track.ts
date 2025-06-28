@@ -1,9 +1,9 @@
 import { insertEvents } from '../lib/table'
 import type { BigQueryEnv } from '../lib/env'
-import { TrackSystemEvent } from '@onepipe/core'
+import type { TrackSystemEvent } from '@onepipe/core'
 import { getCachedAccessTokenForEnv } from '../lib/google'
 import { normalizeEvent, normalizeTableId, withCatchEnsureTableSchema } from './helpers'
-import { BigQueryConnectOptions } from '../lib/types'
+import type { BigQueryConnectOptions } from '../lib/types'
 
 export async function bigquery_handleTrack(event: TrackSystemEvent, env: BigQueryEnv) {
   const tableId = normalizeTableId(event.event)

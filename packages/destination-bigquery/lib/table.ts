@@ -1,4 +1,5 @@
-import { BigQueryEvent, BigQueryConnectOptions, BigQueryInsertResponse, baseUrl } from './types'
+import type { BigQueryEvent, BigQueryConnectOptions, BigQueryInsertResponse } from './types'
+import { baseUrl } from './types'
 
 /**
  * This function is used to insert a new event into the BigQuery table.

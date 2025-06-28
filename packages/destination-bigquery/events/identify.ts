@@ -1,5 +1,5 @@
 import type { BigQueryEnv } from '../lib/env'
-import { IdentifySystemEvent } from '@onepipe/core'
+import type { IdentifySystemEvent } from '@onepipe/core'
 import { getCachedAccessTokenForEnv } from '../lib/google'
 import { normalizeEvent } from './helpers'
 import { insertEvents } from '../lib/table'
