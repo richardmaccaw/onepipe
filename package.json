@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "deploy": "cd packages/worker && wrangler deploy",
-    "dev": "cd packages/worker && wrangler dev",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
     "check:types": "tsc --noEmit",
     "build": "pnpm -r run build",
     "build:client": "pnpm --filter @onepipe/client run build",
