@@ -37,4 +37,8 @@ packages/*/dist/
 
 # Cursor
 cursor/
+
+# Environment files
 .env
+.env.*
+!.env.example

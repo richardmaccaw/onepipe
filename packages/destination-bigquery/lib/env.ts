@@ -8,11 +8,25 @@ export interface BigQueryEnv {
   GOOGLE_CLOUD_CREDENTIALS: string
 }
 
-export function createBigQueryEnv(env: Env & {
-  BIGQUERY_PROJECT_ID: string
-  BIGQUERY_DATASET_ID: string
-  GOOGLE_CLOUD_CREDENTIALS: string
-}): BigQueryEnv {
+export function createBigQueryEnv(
+  env: Env & {
+    BIGQUERY_PROJECT_ID: string
+    BIGQUERY_DATASET_ID: string
+    GOOGLE_CLOUD_CREDENTIALS: string
+  }
+): BigQueryEnv {
+  if (!env.BIGQUERY_PROJECT_ID) {
+    throw new Error('Missing BIGQUERY_PROJECT_ID environment variable. Please set in .env file or wrangler.toml.');
+  }
+  
+  if (!env.BIGQUERY_DATASET_ID) {
+    throw new Error('Missing BIGQUERY_DATASET_ID environment variable. Please set in .env file or wrangler.toml.');
+  }
+  
+  if (!env.GOOGLE_CLOUD_CREDENTIALS) {
+    throw new Error('Missing GOOGLE_CLOUD_CREDENTIALS. Please set using: wrangler secret put GOOGLE_CLOUD_CREDENTIALS');
+  }
+
   return {
     tokenCache: createNamespacedCache(env.TOKEN_CACHE, 'google'),
     BIGQUERY_PROJECT_ID: env.BIGQUERY_PROJECT_ID,

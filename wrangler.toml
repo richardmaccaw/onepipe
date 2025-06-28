@@ -38,12 +38,19 @@ binding = "QUEUE"
 [observability.logs]
 enabled = true
 
-# [env.production]
-# MY_VARIABLE = "production_value"
+# Environment configurations
+# Environment variables are managed via .env files:
+# .env (local development)
+# .env.staging (staging environment)  
+# .env.production (production environment)
 
-# [env.staging]
-# MY_VARIABLE = "staging_value"
+[env.staging]
+name = "onepipe-staging"
 
-# [env.shared]
-# SHARED_VARIABLE = "shared_value"
+[env.production]
+name = "onepipe-production"
+
+# Secrets (sensitive values) should use wrangler secret put:
+# wrangler secret put GOOGLE_CLOUD_CREDENTIALS --env staging
+# wrangler secret put GOOGLE_CLOUD_CREDENTIALS --env production
 
