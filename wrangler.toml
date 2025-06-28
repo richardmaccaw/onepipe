@@ -1,6 +1,6 @@
 name = "onepipe"
 main = "src/worker.ts"
-compatibility_date = "2023-05-20"
+compatibility_date = "2025-06-20"
 
 # # KV Namespace binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/kv
 [[kv_namespaces]]

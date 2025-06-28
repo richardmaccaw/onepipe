@@ -5,21 +5,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ### Development
+
 - `pnpm dev` - Start local development server at http://localhost:8787/
 - `pnpm install` - Install all workspace dependencies
 - `pnpm check:types` - Run TypeScript type checking
 
 ### Building
+
 - `pnpm build` - Build all packages in workspace
 - `pnpm build:core` - Build only the core package
 - `pnpm build:destination-bigquery` - Build only the BigQuery destination package
 
 ### Deployment
+
 - `pnpm run deploy` - Deploy the Cloudflare Worker to production
 - `wrangler queues create onepipe-queue` - Create the required Cloudflare Queue
 - `wrangler kv:namespace create "GOOGLE_TOKENS"` - Create KV namespace for token caching
 
 ### Package Development
+
 - `pnpm --filter @onepipe/[package-name] [command]` - Run commands on specific packages
 
 ## Architecture Overview
@@ -29,17 +33,20 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 ### Core Components
 
 **Cloudflare Worker (`src/worker.ts`)**
+
 - Dual-mode handler: HTTP requests + Queue consumer
 - Uses `cloudflare-basics` router for endpoint management
 - Event flow: HTTP → Queue → Async processing → Destination plugins
 
 **Plugin System (`src/plugin-loader.ts`)**
+
 - Singleton pattern for plugin instances
 - Configuration-driven loading via `onepipe.config.json`
 - Dynamic imports with standardized `DestinationPlugin` interface
 - Each plugin implements optional methods: `identify()`, `track()`, `page()`
 
 **Queue Processing (`src/queue/consumer.ts`)**
+
 - Asynchronous event processing with automatic retry
 - Configurable batch size (default: 10) and timeout (default: 5s)
 - Routes messages to appropriate plugin handlers
@@ -47,16 +54,19 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 ### Monorepo Structure
 
 **`@onepipe/core`** - Foundation package containing:
+
 - Zod schemas for event validation
 - Plugin contracts and environment types
 - Segment-compatible event structures
 
 **Root Application (`src/`)**:
+
 - Main worker entry point and HTTP routing
 - Plugin loading system and queue processing
 - Route handlers for track, identify, and page events
 
 **`@onepipe/destination-bigquery`** - BigQuery plugin:
+
 - Auto-creates tables and schemas
 - Google Cloud service account authentication
 - Bulk event insertion with proper type mapping
@@ -64,6 +74,7 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 ### Configuration
 
 **Plugin Configuration (`onepipe.config.json`)**
+
 ```json
 {
   "destinations": ["@onepipe/destination-bigquery"]
@@ -71,11 +82,13 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 ```
 
 **Environment Variables (Cloudflare Secrets)**
+
 - `BIGQUERY_PROJECT_ID` - BigQuery project identifier
-- `BIGQUERY_DATASET_ID` - BigQuery dataset identifier  
+- `BIGQUERY_DATASET_ID` - BigQuery dataset identifier
 - `GOOGLE_CLOUD_CREDENTIALS` - Service account JSON (base64 encoded)
 
 **Infrastructure (`wrangler.toml`)**
+
 - KV namespace `TOKEN_CACHE` for Google token caching
 - Queue `onepipe-queue` for async event processing
 - Observability logging enabled
@@ -91,17 +104,20 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 ### Key Patterns
 
 **Plugin Development**
+
 - Implement `DestinationPlugin` interface
 - Export default object with `name` and `setup()` function
 - `setup()` returns instance with optional event handlers
 - Add to `onepipe.config.json` destinations array
 
 **Type Safety**
+
 - All events validated with Zod schemas
 - Strict TypeScript across all packages
 - Runtime type checking with compile-time inference
 
 **Error Handling**
+
 - Queue retry logic for failed events
 - Graceful degradation for plugin failures
 - Early validation with detailed error responses
@@ -117,8 +133,9 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 ### API Compatibility
 
 OnePipe maintains full Segment HTTP API compatibility:
+
 - `POST /t` or `/track` - Track events
-- `POST /i` or `/identify` - Identify users  
+- `POST /i` or `/identify` - Identify users
 - `POST /p` or `/page` - Page views
 - `OPTIONS` - CORS preflight handling
 
