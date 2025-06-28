@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@hono/zod-validator':
+        specifier: ^0.7.0
+        version: 0.7.0(hono@4.8.3)(zod@3.25.67)
       '@maccman/web-auth-library':
         specifier: ^1.0.5
         version: 1.0.5
@@ -17,9 +20,9 @@ importers:
       '@onepipe/destination-bigquery':
         specifier: workspace:*
         version: link:packages/destination-bigquery
-      cloudflare-basics:
-        specifier: ^0.0.9
-        version: 0.0.9(zod@3.25.67)
+      hono:
+        specifier: ^4.8.3
+        version: 4.8.3
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -46,24 +49,14 @@ importers:
         specifier: ^4.22.0
         version: 4.22.0(@cloudflare/workers-types@4.20250628.0)
 
-  packages/client:
-    dependencies:
-      '@onepipe/core':
-        specifier: workspace:*
-        version: link:../core
-    devDependencies:
-      typescript:
-        specifier: ^5.8.3
-        version: 5.8.3
-
   packages/core:
     dependencies:
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
       zod:
-        specifier: ^3.24.2
-        version: 3.24.2
+        specifier: ^3.25.67
+        version: 3.25.67
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20250603.0
@@ -84,25 +77,6 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
     devDependencies:
-      typescript:
-        specifier: ^5.8.3
-        version: 5.8.3
-
-  packages/worker:
-    dependencies:
-      '@onepipe/core':
-        specifier: workspace:*
-        version: link:../core
-      '@onepipe/destination-bigquery':
-        specifier: workspace:*
-        version: link:../destination-bigquery
-      cloudflare-basics:
-        specifier: ^0.0.9
-        version: 0.0.9(zod@3.24.2)
-    devDependencies:
-      '@cloudflare/workers-types':
-        specifier: ^4.20250603.0
-        version: 4.20250603.0
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -319,6 +293,12 @@ packages:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
 
+  '@hono/zod-validator@0.7.0':
+    resolution: {integrity: sha512-qe2ZE6sHFE98dcUrbYMtS3bAV8hqcCOflykvZga2S7XhmNSZzT+dIz4OuMILsjLHkJw9JMn912/dB7dQOmuPvg==}
+    peerDependencies:
+      hono: '>=3.9.0'
+      zod: ^3.25.0
+
   '@img/sharp-darwin-arm64@0.33.5':
     resolution: {integrity: sha512-UT4p+iz/2H4twwAoLCqfA9UH5pI6DggwKEGuaPy7nCVQ8ZsiY5PIcrRvD1DzuY3qYL07NtIQcWnBSY/heikIFQ==}
     engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
@@ -458,11 +438,6 @@ packages:
   blake3-wasm@2.1.5:
     resolution: {integrity: sha512-F1+K8EbfOZE49dtoPtmxUQrpXaBIl3ICvasLh+nJta0xkz+9kF/7uet9fLnwKqhDrmj6g+6K3Tw9yQPUg2ka5g==}
 
-  cloudflare-basics@0.0.9:
-    resolution: {integrity: sha512-Bfzxb0HAySEEoIYM0oTloZlREgVjJpHTkTRI1gPsCaof5miXcV1r1+EGQwsA2AYXTm//ehFZMnJh2/cSD2BtUw==}
-    peerDependencies:
-      zod: ^3.22.1
-
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
     engines: {node: '>=7.0.0'}
@@ -513,6 +488,10 @@ packages:
 
   glob-to-regexp@0.4.1:
     resolution: {integrity: sha512-lkX1HJXwyMcprw/5YUZc2s7DrpAiHB21/V+E1rHUrVNokkvB6bqMzT0VfV6/86ZNabt1k14YOIaT7nDvOX3Iiw==}
+
+  hono@4.8.3:
+    resolution: {integrity: sha512-jYZ6ZtfWjzBdh8H/0CIFfCBHaFL75k+KMzaM177hrWWm2TWL39YMYaJgB74uK/niRc866NMlH9B8uCvIo284WQ==}
+    engines: {node: '>=16.9.0'}
 
   is-arrayish@0.3.2:
     resolution: {integrity: sha512-eVRqCvVlZbuw3GrM63ovNSNAeA1K16kaR/LRY/92w0zxQ5/1YzwblUX652i4Xs9RwAGjW9d9y6X88t8OaAJfWQ==}
@@ -632,9 +611,6 @@ packages:
 
   zod@3.22.3:
     resolution: {integrity: sha512-EjIevzuJRiRPbVH4mGc8nApb/lVLKVpmUhAaR5R5doKGfAnGJ6Gr3CViAVjP+4FWSxCsybeWQdcgCtbX+7oZug==}
-
-  zod@3.24.2:
-    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
 
   zod@3.25.67:
     resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
@@ -757,6 +733,11 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
+  '@hono/zod-validator@0.7.0(hono@4.8.3)(zod@3.25.67)':
+    dependencies:
+      hono: 4.8.3
+      zod: 3.25.67
+
   '@img/sharp-darwin-arm64@0.33.5':
     optionalDependencies:
       '@img/sharp-libvips-darwin-arm64': 1.0.4
@@ -860,14 +841,6 @@ snapshots:
 
   blake3-wasm@2.1.5: {}
 
-  cloudflare-basics@0.0.9(zod@3.24.2):
-    dependencies:
-      zod: 3.24.2
-
-  cloudflare-basics@0.0.9(zod@3.25.67):
-    dependencies:
-      zod: 3.25.67
-
   color-convert@2.0.1:
     dependencies:
       color-name: 1.1.4
@@ -933,6 +906,8 @@ snapshots:
       source-map: 0.6.1
 
   glob-to-regexp@0.4.1: {}
+
+  hono@4.8.3: {}
 
   is-arrayish@0.3.2: {}
 
@@ -1073,7 +1048,5 @@ snapshots:
       stacktracey: 2.1.8
 
   zod@3.22.3: {}
-
-  zod@3.24.2: {}
 
   zod@3.25.67: {}

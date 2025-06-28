@@ -14,7 +14,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "zod": "^3.24.2",
+    "zod": "^3.25.67",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
