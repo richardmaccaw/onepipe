@@ -1,5 +1,4 @@
 import { Env as BaseEnv } from '@onepipe/core'
-import { BigQueryEnv, createBigQueryEnv } from '@onepipe/destination-bigquery'
 
 export interface Env extends BaseEnv {
   BIGQUERY_PROJECT_ID: string
