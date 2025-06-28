@@ -90,5 +90,5 @@ export interface DestinationPluginInstance {
 
 export interface DestinationPlugin {
   name: string
-  setup(env: Env): DestinationPluginInstance
+  setup(env: Env, config?: Record<string, any>): DestinationPluginInstance
 }

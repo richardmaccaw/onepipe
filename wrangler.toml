@@ -38,12 +38,18 @@ binding = "QUEUE"
 [observability.logs]
 enabled = true
 
-# [env.production]
-# MY_VARIABLE = "production_value"
+# Environment configurations
+[env.staging]
+name = "onepipe-staging"
+BIGQUERY_PROJECT_ID = "my-staging-project"
+BIGQUERY_DATASET_ID = "analytics_staging"
 
-# [env.staging]
-# MY_VARIABLE = "staging_value"
+[env.production]
+name = "onepipe-production"
+BIGQUERY_PROJECT_ID = "my-production-project"
+BIGQUERY_DATASET_ID = "analytics_production"
 
-# [env.shared]
-# SHARED_VARIABLE = "shared_value"
+# Secrets (sensitive values) should still use wrangler secret put:
+# wrangler secret put GOOGLE_CLOUD_CREDENTIALS --env staging
+# wrangler secret put GOOGLE_CLOUD_CREDENTIALS --env production
 
