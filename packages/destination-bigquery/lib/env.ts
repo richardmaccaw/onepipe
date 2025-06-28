@@ -1,19 +1,10 @@
 import type { Cache, Env } from '@onepipe/core'
 import { createNamespacedCache } from '@onepipe/core'
+import { BigQueryEnv } from './types'
 
-export interface BigQueryEnv {
-  tokenCache: Cache
-  BIGQUERY_PROJECT_ID: string
-  BIGQUERY_DATASET_ID: string
-  GOOGLE_CLOUD_CREDENTIALS: string
-}
 
 export function createBigQueryEnv(
-  env: Env & {
-    BIGQUERY_PROJECT_ID: string
-    BIGQUERY_DATASET_ID: string
-    GOOGLE_CLOUD_CREDENTIALS: string
-  }
+  env: Env & BigQueryEnv
 ): BigQueryEnv {
   if (!env.BIGQUERY_PROJECT_ID) {
     throw new Error('Missing BIGQUERY_PROJECT_ID environment variable. Please set in .env file or wrangler.toml.');

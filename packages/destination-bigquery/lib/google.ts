@@ -1,5 +1,5 @@
 import { getAccessToken } from '@maccman/web-auth-library/google'
-import type { BigQueryEnv } from './env'
+import type { BigQueryEnv } from './types'
 
 // Generate a short lived access token from the service account key credentials
 
