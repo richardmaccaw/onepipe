@@ -3,7 +3,6 @@ import type { DestinationPlugin, DestinationPluginInstance } from '@onepipe/core
 
 interface PluginConfig {
   destinations?: string[];
-  pluginConfigs?: Record<string, any>;
 }
 
 class PluginManager {
@@ -62,10 +61,7 @@ class PluginManager {
           const pluginModule = await import(pluginName);
           const plugin: DestinationPlugin = pluginModule.default || pluginModule;
           
-          // Pass plugin-specific config if available
-          const pluginConfig = this.config.pluginConfigs?.[pluginName] || {};
-          
-          return plugin.setup(env, pluginConfig);
+          return plugin.setup(env);
         } catch (error) {
           console.error(`Failed to load plugin ${pluginName}:`, error);
           throw new Error(`Plugin "${pluginName}" could not be loaded. Make sure it's installed: pnpm add ${pluginName}`);

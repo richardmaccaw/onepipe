@@ -1,8 +1,3 @@
 {
-  "destinations": ["@onepipe/destination-bigquery"],
-  "pluginConfigs": {
-    "@onepipe/destination-bigquery": {
-      "tablePrefix": "onepipe_"
-    }
-  }
+  "destinations": ["@onepipe/destination-bigquery"]
 }

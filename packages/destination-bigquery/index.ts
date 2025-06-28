@@ -13,8 +13,8 @@ import { createBigQueryEnv } from './lib/env'
 
 export const destinationBigQuery: DestinationPlugin = {
   name: '@onepipe/destination-bigquery',
-  setup(env, config = {}) {
-    const pluginEnv = createBigQueryEnv(env as any, config)
+  setup(env) {
+    const pluginEnv = createBigQueryEnv(env as any)
     return {
       identify: (event) => bigquery_handleIdentify(event, pluginEnv),
       track: (event) => bigquery_handleTrack(event, pluginEnv),
