@@ -13,6 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm build` - Build all packages in workspace
 - `pnpm build:client` - Build only the client SDK package
 - `pnpm build:core` - Build only the core package
+- `pnpm build:worker` - Build only the worker package
 - `pnpm build:destination-bigquery` - Build only the BigQuery destination package
 
 ### Deployment
@@ -22,6 +23,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Package Development
 - `pnpm dev:client` - Start client package in development mode
+- `pnpm dev:worker` - Start worker package in development mode
 - `pnpm --filter @onepipe/[package-name] [command]` - Run commands on specific packages
 
 ## Architecture Overview
@@ -30,18 +32,18 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 
 ### Core Components
 
-**Cloudflare Worker (`src/worker.ts`)**
+**Cloudflare Worker (`packages/worker/src/worker.ts`)**
 - Dual-mode handler: HTTP requests + Queue consumer
 - Uses `cloudflare-basics` router for endpoint management
 - Event flow: HTTP → Queue → Async processing → Destination plugins
 
-**Plugin System (`src/plugin-loader.ts`)**
+**Plugin System (`packages/worker/src/plugin-loader.ts`)**
 - Singleton pattern for plugin instances
 - Configuration-driven loading via `onepipe.config.json`
 - Dynamic imports with standardized `DestinationPlugin` interface
 - Each plugin implements optional methods: `identify()`, `track()`, `page()`
 
-**Queue Processing (`src/queue/consumer.ts`)**
+**Queue Processing (`packages/worker/src/queue/consumer.ts`)**
 - Asynchronous event processing with automatic retry
 - Configurable batch size (default: 10) and timeout (default: 5s)
 - Routes messages to appropriate plugin handlers
@@ -52,6 +54,11 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 - Zod schemas for event validation
 - Plugin contracts and environment types
 - Segment-compatible event structures
+
+**`@onepipe/worker`** - Cloudflare Worker package:
+- Main worker entry point and HTTP routing
+- Plugin loading system and queue processing
+- Route handlers for track, identify, and page events
 
 **`@onepipe/client`** - Browser/Node SDK:
 - Drop-in replacement for Segment SDK
@@ -111,9 +118,10 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 
 1. **Plugin Development**: Create in `packages/destination-[name]/`
 2. **Core Changes**: Modify types in `@onepipe/core` package
-3. **Client Changes**: Update SDK in `@onepipe/client` package
-4. **Testing**: Use `pnpm dev` with local requests to test endpoints
-5. **Deployment**: Use `pnpm run deploy` for production deployment
+3. **Worker Changes**: Modify routing/logic in `@onepipe/worker` package
+4. **Client Changes**: Update SDK in `@onepipe/client` package
+5. **Testing**: Use `pnpm dev` with local requests to test endpoints
+6. **Deployment**: Use `pnpm run deploy` for production deployment
 
 ### API Compatibility
 
