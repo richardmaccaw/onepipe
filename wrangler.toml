@@ -45,20 +45,20 @@ enabled = true
 [vars]
 # BigQuery configuration (non-sensitive)
 # Override these in environment-specific sections below
-BIGQUERY_PROJECT_ID = ""
-BIGQUERY_DATASET_ID = ""
+BIGQUERY_PROJECT_ID = "your-project-id"
+BIGQUERY_DATASET_ID = "your-dataset-id"
 
 [env.staging]
 name = "onepipe-staging"
 [env.staging.vars]
-BIGQUERY_PROJECT_ID = ""
-BIGQUERY_DATASET_ID = ""
+BIGQUERY_PROJECT_ID = "your-project-id"
+BIGQUERY_DATASET_ID = "your-dataset-id"
 
 [env.production]  
 name = "onepipe-production"
 [env.production.vars]
-BIGQUERY_PROJECT_ID = ""
-BIGQUERY_DATASET_ID = ""
+BIGQUERY_PROJECT_ID = "your-project-id"
+BIGQUERY_DATASET_ID = "your-dataset-id"
 
 # Secrets (set via wrangler CLI):
 # wrangler secret put GOOGLE_CLOUD_CREDENTIALS
