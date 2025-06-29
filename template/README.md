@@ -16,7 +16,10 @@ Click the **Deploy to Cloudflare Workers** button above to deploy your own OnePi
 ### After deployment:
 
 1. Note the **setup token** from the deployment logs
-2. Visit your worker URL at `/setup?token=YOUR_SETUP_TOKEN`
+2. Visit your worker URL at `/setup` with Bearer authentication:
+   ```bash
+   curl -H "Authorization: Bearer YOUR_SETUP_TOKEN" https://your-worker.workers.dev/setup
+   ```
 3. Choose your destinations (BigQuery, etc.)
 4. Complete OAuth authentication
 5. Configure project/dataset settings
@@ -42,14 +45,14 @@ npx wrangler deploy
 
 ## Environment Variables
 
-### Required for OAuth (can be set after deployment):
-- `GOOGLE_OAUTH_CLIENT_ID` - Google OAuth client ID
-- `GOOGLE_OAUTH_CLIENT_SECRET` - Google OAuth client secret
-
-### Set during configuration:
+### Required:
+- `GOOGLE_CLOUD_CREDENTIALS` - Base64 encoded service account JSON
 - `BIGQUERY_PROJECT_ID` - Your Google Cloud project ID
 - `BIGQUERY_DATASET_ID` - BigQuery dataset for events
-- `SETUP_MODE` - Controls whether setup interface is available
+
+### Optional:
+- `SETUP_MODE` - Set to `"true"` to enable setup interface
+- `SETUP_TOKEN` - Bearer token for setup authentication (auto-generated)
 
 ## Usage
 
