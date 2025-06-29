@@ -1,12 +1,12 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { bearerAuth } from 'hono/bearer-auth'
 import { zValidator } from '@hono/zod-validator'
 import { v4 as uuid } from 'uuid'
 import type { Env } from './types'
 import { trackEventSchema, identifyEventSchema, pageEventSchema } from '@onepipe/core'
 import type { TrackEvent, IdentifyEvent, PageEvent, TrackSystemEvent, IdentifySystemEvent, QueueMessage } from '@onepipe/core'
 import { safeConsumeMessage } from './queue/consumer'
-import { validateSetupToken, extractSetupToken } from './setup/token'
 import { getOAuthConfig, exchangeCodeForTokens, storeOAuthTokens, getOAuthTokens, getGoogleProjects, getBigQueryDatasets } from './setup/oauth'
 
 const app = new Hono()
@@ -15,8 +15,49 @@ const app = new Hono()
 app.use('*', cors({
   origin: '*',
   allowMethods: ['POST', 'GET', 'OPTIONS'],
-  allowHeaders: ['Content-Type'],
+  allowHeaders: ['Content-Type', 'Authorization'],
 }))
+
+// Protect setup routes with Bearer Auth
+app.use('/setup/*', (c, next) => {
+  const env = c.env as Env
+  if (env.SETUP_MODE === 'true' && env.SETUP_TOKEN) {
+    return bearerAuth({ token: env.SETUP_TOKEN })(c, next)
+  }
+  return next()
+})
+
+app.use('/auth/*', (c, next) => {
+  const env = c.env as Env
+  if (env.SETUP_MODE === 'true' && env.SETUP_TOKEN) {
+    return bearerAuth({ token: env.SETUP_TOKEN })(c, next)
+  }
+  return next()
+})
+
+app.use('/configure*', (c, next) => {
+  const env = c.env as Env
+  if (env.SETUP_MODE === 'true' && env.SETUP_TOKEN) {
+    return bearerAuth({ token: env.SETUP_TOKEN })(c, next)
+  }
+  return next()
+})
+
+app.use('/api/configure', (c, next) => {
+  const env = c.env as Env
+  if (env.SETUP_MODE === 'true' && env.SETUP_TOKEN) {
+    return bearerAuth({ token: env.SETUP_TOKEN })(c, next)
+  }
+  return next()
+})
+
+app.use('/api/datasets', (c, next) => {
+  const env = c.env as Env
+  if (env.SETUP_MODE === 'true' && env.SETUP_TOKEN) {
+    return bearerAuth({ token: env.SETUP_TOKEN })(c, next)
+  }
+  return next()
+})
 
 app.get('/', (c) => {
   const env = c.env as Env
@@ -53,65 +94,6 @@ app.get('/setup', (c) => {
     return c.html('<h1>Setup not available</h1><p>This worker is not in setup mode.</p>', 404)
   }
 
-  const providedToken = c.req.query('token')
-  const setupToken = env.SETUP_TOKEN || 'not-set'
-  
-  // If no token provided in URL, show token requirement
-  if (!providedToken) {
-    return c.html(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>OnePipe Setup - Token Required</title>
-        <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
-          .token-box { background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; border-radius: 8px; margin: 20px 0; }
-          .token { font-family: monospace; background: #e9ecef; padding: 10px; border-radius: 4px; word-break: break-all; }
-          .continue-btn { background: #0066cc; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; display: inline-block; }
-        </style>
-      </head>
-      <body>
-        <h1>🔐 OnePipe Setup - Authentication Required</h1>
-        <p>To access the OnePipe setup interface, you need to provide your setup token.</p>
-        
-        <div class="token-box">
-          <h3>Your Setup Token:</h3>
-          <div class="token">${setupToken}</div>
-        </div>
-        
-        <p>Click the button below to continue with setup:</p>
-        <a href="/setup?token=${setupToken}" class="continue-btn">Continue to Setup</a>
-        
-        <hr>
-        <p><small>This token was generated during deployment. Keep it secure and don't share it publicly.</small></p>
-      </body>
-      </html>
-    `)
-  }
-  
-  // Validate the provided token
-  if (!validateSetupToken(env, providedToken)) {
-    return c.html(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>OnePipe Setup - Invalid Token</title>
-        <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
-          .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; border-radius: 4px; margin: 20px 0; }
-        </style>
-      </head>
-      <body>
-        <h1>❌ Invalid Setup Token</h1>
-        <div class="error">
-          The provided setup token is invalid. Please check your token and try again.
-        </div>
-        <p><a href="/setup">← Back to Setup</a></p>
-      </body>
-      </html>
-    `, 403)
-  }
-
   return c.html(`
     <!DOCTYPE html>
     <html>
@@ -131,7 +113,8 @@ app.get('/setup', (c) => {
       <p>Your OnePipe worker has been deployed successfully! Now let's configure your destinations.</p>
       
       <div class="setup-token">
-        <strong>Setup Token:</strong> ${env.SETUP_TOKEN || 'Not set'}
+        <strong>Setup Token (Bearer):</strong> ${env.SETUP_TOKEN || 'Not set'}
+        <br><small>Use as: <code>Authorization: Bearer ${env.SETUP_TOKEN || 'token'}</code></small>
       </div>
 
       <h2>Available Destinations</h2>
@@ -150,9 +133,10 @@ app.get('/setup', (c) => {
 
       <script>
         function configureDestination(type) {
-          const token = new URLSearchParams(window.location.search).get('token');
+          const setupToken = '${env.SETUP_TOKEN || 'not-set'}';
           if (type === 'bigquery') {
-            window.location.href = '/auth/google?destination=bigquery&state=' + token;
+            // Redirect to OAuth with setup token in destination param for later use
+            window.location.href = '/auth/google?destination=bigquery';
           }
         }
       </script>
@@ -170,11 +154,7 @@ app.get('/auth/google', (c) => {
   }
 
   const destination = c.req.query('destination')
-  const state = c.req.query('state')
-  
-  if (!validateSetupToken(env, state)) {
-    return c.json({ error: 'Invalid setup token' }, 403)
-  }
+  const setupToken = env.SETUP_TOKEN || 'not-set'
 
   // Get OAuth configuration
   const oauthConfig = getOAuthConfig(env, c.req.url)
@@ -198,7 +178,7 @@ app.get('/auth/google', (c) => {
   authUrl.searchParams.set('redirect_uri', oauthConfig.redirectUri)
   authUrl.searchParams.set('response_type', 'code')
   authUrl.searchParams.set('scope', scope)
-  authUrl.searchParams.set('state', JSON.stringify({ setupToken: state, destination }))
+  authUrl.searchParams.set('state', JSON.stringify({ setupToken, destination }))
   authUrl.searchParams.set('access_type', 'offline')
   authUrl.searchParams.set('prompt', 'consent')
 
@@ -235,10 +215,6 @@ app.get('/callback/google', async (c) => {
 
   try {
     const stateData = JSON.parse(state)
-    
-    if (!validateSetupToken(env, stateData.setupToken)) {
-      return c.json({ error: 'Invalid setup token' }, 403)
-    }
 
     // Exchange code for tokens
     const oauthConfig = getOAuthConfig(env, c.req.url)
@@ -251,7 +227,7 @@ app.get('/callback/google', async (c) => {
         <h1>🎉 Authentication Successful!</h1>
         <p>Your Google account has been connected successfully.</p>
         <p>Next step: Configure your BigQuery project and dataset.</p>
-        <p><a href="/configure?token=${stateData.setupToken}&destination=${stateData.destination}">Continue Setup</a></p>
+        <p><a href="/configure?destination=${stateData.destination}">Continue Setup</a></p>
       `)
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
@@ -278,16 +254,12 @@ app.get('/configure', async (c) => {
     return c.json({ error: 'Setup not available' }, 404)
   }
 
-  const token = c.req.query('token')
   const destination = c.req.query('destination')
-  
-  if (!validateSetupToken(env, token)) {
-    return c.json({ error: 'Invalid setup token' }, 403)
-  }
+  const setupToken = env.SETUP_TOKEN || 'not-set'
 
   if (destination === 'bigquery') {
     // Try to get OAuth tokens and fetch projects/datasets
-    const oauthTokens = await getOAuthTokens(env, token!)
+    const oauthTokens = await getOAuthTokens(env, setupToken)
     let projectsOptions = ''
     let datasetsOptions = ''
     
@@ -347,7 +319,7 @@ app.get('/configure', async (c) => {
         </form>
 
         <script>
-          const token = '${token}';
+          const setupToken = '${setupToken}';
           
           async function loadDatasets() {
             const projectId = document.getElementById('projectId').value;
@@ -361,7 +333,9 @@ app.get('/configure', async (c) => {
             datasetSelect.innerHTML = '<option value="" class="loading">Loading datasets...</option>';
             
             try {
-              const response = await fetch(\`/api/datasets?token=\${token}&projectId=\${projectId}\`);
+              const response = await fetch(\`/api/datasets?projectId=\${projectId}\`, {
+                headers: { 'Authorization': \`Bearer \${setupToken}\` }
+              });
               const datasets = await response.json();
               
               datasetSelect.innerHTML = '<option value="">Select a dataset...</option>';
@@ -387,7 +361,6 @@ app.get('/configure', async (c) => {
             
             const config = {
               destination: '${destination}',
-              token: '${token}',
               projectId: formData.get('projectId'),
               datasetId: datasetId
             };
@@ -395,7 +368,10 @@ app.get('/configure', async (c) => {
             try {
               const response = await fetch('/api/configure', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                  'Content-Type': 'application/json',
+                  'Authorization': \`Bearer \${setupToken}\`
+                },
                 body: JSON.stringify(config)
               });
               
@@ -427,11 +403,7 @@ app.post('/api/configure', async (c) => {
   }
 
   const body = await c.req.json()
-  const { token, destination, projectId, datasetId } = body
-  
-  if (!validateSetupToken(env, token)) {
-    return c.json({ error: 'Invalid setup token' }, 403)
-  }
+  const { destination, projectId, datasetId } = body
 
   // TODO: Update worker configuration via Cloudflare API
   // For now, just return success
@@ -454,12 +426,8 @@ app.get('/api/datasets', async (c) => {
     return c.json({ error: 'Setup not available' }, 404)
   }
 
-  const token = c.req.query('token')
   const projectId = c.req.query('projectId')
-  
-  if (!validateSetupToken(env, token)) {
-    return c.json({ error: 'Invalid setup token' }, 403)
-  }
+  const setupToken = env.SETUP_TOKEN || 'not-set'
 
   if (!projectId) {
     return c.json({ error: 'Project ID is required' }, 400)
@@ -467,7 +435,7 @@ app.get('/api/datasets', async (c) => {
 
   try {
     // Get OAuth tokens
-    const oauthTokens = await getOAuthTokens(env, token!)
+    const oauthTokens = await getOAuthTokens(env, setupToken)
     
     if (!oauthTokens?.accessToken) {
       return c.json({ error: 'No authentication token found' }, 401)

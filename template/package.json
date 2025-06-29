@@ -5,7 +5,7 @@
   "description": "Template for deploying OnePipe analytics infrastructure",
   "main": "src/worker.ts",
   "scripts": {
-    "postinstall": "node -e \"const crypto = require('crypto'); const fs = require('fs'); const token = crypto.randomUUID(); const toml = fs.readFileSync('wrangler.toml', 'utf8'); const updated = toml.replace('SETUP_MODE = \\\"true\\\"', 'SETUP_MODE = \\\"true\\\"\\nSETUP_TOKEN = \\\"' + token + '\\\"'); fs.writeFileSync('wrangler.toml', updated); fs.writeFileSync('.setup-token', token); console.log('\\n🔑 OnePipe Setup Token Generated!\\nToken:', token, '\\n\\nAfter deployment, visit: https://your-worker.your-subdomain.workers.dev/setup?token=' + token);\"",
+    "postinstall": "node -e \"const crypto = require('crypto'); const fs = require('fs'); const token = crypto.randomUUID(); const toml = fs.readFileSync('wrangler.toml', 'utf8'); const updated = toml.replace('SETUP_MODE = \\\"true\\\"', 'SETUP_MODE = \\\"true\\\"\\nSETUP_TOKEN = \\\"' + token + '\\\"'); fs.writeFileSync('wrangler.toml', updated); fs.writeFileSync('.setup-token', token); console.log('\\n🔑 OnePipe Setup Token Generated!\\nToken:', token, '\\n\\nAfter deployment:\\n1. Visit: https://your-worker.your-subdomain.workers.dev/setup\\n2. Use Bearer token: Authorization: Bearer ' + token);\"",
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
     "build": "echo 'No build step required'"
