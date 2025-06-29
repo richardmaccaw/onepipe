@@ -4,11 +4,13 @@
  */
 
 // Generate a key from setup token for encryption
-async function generateKey(setupToken: string): Promise<CryptoKey> {
+async function generateKey(setupToken: string, salt: Uint8Array): Promise<CryptoKey> {
   const encoder = new TextEncoder()
+  
+  // Use the full setup token as key material without truncation
   const keyMaterial = await crypto.subtle.importKey(
     'raw',
-    encoder.encode(setupToken.slice(0, 32).padEnd(32, '0')),
+    encoder.encode(setupToken),
     { name: 'PBKDF2' },
     false,
     ['deriveKey']
@@ -17,7 +19,7 @@ async function generateKey(setupToken: string): Promise<CryptoKey> {
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: encoder.encode('onepipe-salt'),
+      salt,
       iterations: 100000,
       hash: 'SHA-256'
     },
@@ -32,9 +34,13 @@ async function generateKey(setupToken: string): Promise<CryptoKey> {
  * Encrypt sensitive data using setup token as key material
  */
 export async function encryptData(data: string, setupToken: string): Promise<string> {
-  const key = await generateKey(setupToken)
   const encoder = new TextEncoder()
+  
+  // Generate random salt and IV for each encryption
+  const salt = crypto.getRandomValues(new Uint8Array(16))
   const iv = crypto.getRandomValues(new Uint8Array(12))
+  
+  const key = await generateKey(setupToken, salt)
   
   const encrypted = await crypto.subtle.encrypt(
     { name: 'AES-GCM', iv },
@@ -42,13 +48,15 @@ export async function encryptData(data: string, setupToken: string): Promise<str
     encoder.encode(data)
   )
   
-  // Combine IV and encrypted data
-  const combined = new Uint8Array(iv.length + encrypted.byteLength)
-  combined.set(iv)
-  combined.set(new Uint8Array(encrypted), iv.length)
+  // Combine salt, IV, and encrypted data
+  const combined = new Uint8Array(salt.length + iv.length + encrypted.byteLength)
+  combined.set(salt, 0)
+  combined.set(iv, salt.length)
+  combined.set(new Uint8Array(encrypted), salt.length + iv.length)
   
-  // Return base64 encoded
-  return btoa(String.fromCharCode(...combined))
+  // Use proper base64 encoding
+  const base64 = btoa(String.fromCharCode(...combined))
+  return base64
 }
 
 /**
@@ -56,13 +64,16 @@ export async function encryptData(data: string, setupToken: string): Promise<str
  */
 export async function decryptData(encryptedData: string, setupToken: string): Promise<string> {
   try {
-    const key = await generateKey(setupToken)
     const combined = new Uint8Array(
       atob(encryptedData).split('').map(char => char.charCodeAt(0))
     )
     
-    const iv = combined.slice(0, 12)
-    const encrypted = combined.slice(12)
+    // Extract salt, IV, and encrypted data
+    const salt = combined.slice(0, 16)
+    const iv = combined.slice(16, 28)
+    const encrypted = combined.slice(28)
+    
+    const key = await generateKey(setupToken, salt)
     
     const decrypted = await crypto.subtle.decrypt(
       { name: 'AES-GCM', iv },
