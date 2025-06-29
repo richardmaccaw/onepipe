@@ -8,7 +8,7 @@ Open-source Segment alternative built on Cloudflare Workers with a plugin-based 
 
 Click the deploy button to get started in seconds:
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/YOUR_USERNAME/onepipe)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/richardmaccaw/onepipe)
 
 ### Option 2: Manual Setup
 
@@ -24,11 +24,13 @@ Click the deploy button to get started in seconds:
 Set these in your Cloudflare Worker dashboard or via `wrangler secret put`:
 
 **Required:**
+
 - `GOOGLE_CLOUD_CREDENTIALS` - Base64 encoded service account JSON
 - `BIGQUERY_PROJECT_ID` - Your BigQuery project ID
 - `BIGQUERY_DATASET_ID` - Your BigQuery dataset ID
 
 **Optional:**
+
 - `SETUP_MODE` - Set to `"true"` to enable setup UI
 - `SETUP_TOKEN` - Bearer token for setup authentication
 
@@ -41,6 +43,7 @@ After deployment, if `SETUP_MODE=true`, visit `https://your-worker.workers.dev/s
 3. Test your configuration
 
 Access requires Bearer token authentication:
+
 ```bash
 curl -H "Authorization: Bearer YOUR_SETUP_TOKEN" https://your-worker.workers.dev/setup
 ```
@@ -50,13 +53,14 @@ curl -H "Authorization: Bearer YOUR_SETUP_TOKEN" https://your-worker.workers.dev
 OnePipe provides full Segment HTTP API compatibility:
 
 - `POST /t` or `/track` - Track events
-- `POST /i` or `/identify` - Identify users  
+- `POST /i` or `/identify` - Identify users
 - `POST /p` or `/page` - Page views
 - `OPTIONS` - CORS preflight handling
 
 ## Architecture
 
 **Event Flow:**
+
 1. HTTP Request → Route handler validates event schema
 2. Queue → Event enqueued for async processing
 3. Consumer → Processes events in batches
@@ -64,6 +68,7 @@ OnePipe provides full Segment HTTP API compatibility:
 5. BigQuery → Auto-creates tables and inserts events
 
 **Plugin System:**
+
 - Configuration-driven loading via `onepipe.config.json`
 - Standardized `DestinationPlugin` interface
 - Support for multiple destinations simultaneously
