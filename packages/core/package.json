@@ -14,11 +14,10 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "zod": "^3.25.67",
-    "lodash": "^4.17.21"
+    "zod": "catalog:",
+    "lodash": "catalog:"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250603.0",
-    "typescript": "^5.8.3"
+    "typescript": "catalog:dev"
   }
 }

@@ -4,15 +4,52 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@hono/zod-validator':
+      specifier: ^0.7.0
+      version: 0.7.0
+    '@maccman/web-auth-library':
+      specifier: ^1.0.5
+      version: 1.0.5
+    hono:
+      specifier: ^4.8.3
+      version: 4.8.3
+    lodash:
+      specifier: ^4.17.21
+      version: 4.17.21
+    uuid:
+      specifier: ^11.1.0
+      version: 11.1.0
+    web-auth-library:
+      specifier: ^1.0.3
+      version: 1.0.3
+    zod:
+      specifier: ^3.25.67
+      version: 3.25.67
+  dev:
+    '@types/lodash':
+      specifier: ^4.17.19
+      version: 4.17.19
+    '@types/uuid':
+      specifier: ^10.0.0
+      version: 10.0.0
+    typescript:
+      specifier: ^5.8.3
+      version: 5.8.3
+    wrangler:
+      specifier: ^4.22.0
+      version: 4.22.0
+
 importers:
 
   .:
     dependencies:
       '@hono/zod-validator':
-        specifier: ^0.7.0
+        specifier: 'catalog:'
         version: 0.7.0(hono@4.8.3)(zod@3.25.67)
       '@maccman/web-auth-library':
-        specifier: ^1.0.5
+        specifier: 'catalog:'
         version: 1.0.5
       '@onepipe/core':
         specifier: workspace:*
@@ -21,64 +58,61 @@ importers:
         specifier: workspace:*
         version: link:packages/destination-bigquery
       hono:
-        specifier: ^4.8.3
+        specifier: 'catalog:'
         version: 4.8.3
       lodash:
-        specifier: ^4.17.21
+        specifier: 'catalog:'
         version: 4.17.21
       uuid:
-        specifier: ^11.1.0
+        specifier: 'catalog:'
         version: 11.1.0
       web-auth-library:
-        specifier: ^1.0.3
+        specifier: 'catalog:'
         version: 1.0.3
       zod:
-        specifier: ^3.25.67
+        specifier: 'catalog:'
         version: 3.25.67
     devDependencies:
       '@types/lodash':
-        specifier: ^4.17.19
+        specifier: catalog:dev
         version: 4.17.19
       '@types/uuid':
-        specifier: ^10.0.0
+        specifier: catalog:dev
         version: 10.0.0
       typescript:
-        specifier: ^5.8.3
+        specifier: catalog:dev
         version: 5.8.3
       wrangler:
-        specifier: ^4.22.0
+        specifier: catalog:dev
         version: 4.22.0(@cloudflare/workers-types@4.20250628.0)
 
   packages/core:
     dependencies:
       lodash:
-        specifier: ^4.17.21
+        specifier: 'catalog:'
         version: 4.17.21
       zod:
-        specifier: ^3.25.67
+        specifier: 'catalog:'
         version: 3.25.67
     devDependencies:
-      '@cloudflare/workers-types':
-        specifier: ^4.20250603.0
-        version: 4.20250603.0
       typescript:
-        specifier: ^5.8.3
+        specifier: catalog:dev
         version: 5.8.3
 
   packages/destination-bigquery:
     dependencies:
       '@maccman/web-auth-library':
-        specifier: ^1.0.5
+        specifier: 'catalog:'
         version: 1.0.5
       '@onepipe/core':
         specifier: workspace:*
         version: link:../core
       lodash:
-        specifier: ^4.17.21
+        specifier: 'catalog:'
         version: 4.17.21
     devDependencies:
       typescript:
-        specifier: ^5.8.3
+        specifier: catalog:dev
         version: 5.8.3
 
 packages:
@@ -125,9 +159,6 @@ packages:
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
-
-  '@cloudflare/workers-types@4.20250603.0':
-    resolution: {integrity: sha512-62g5wVdXiRRu9sfC9fmwgZfE9W0rWy2txlgRKn1Xx1NWHshSdh4RWMX6gO4EBKPqgwlHKaMuSPZ1qM0hHsq7bA==}
 
   '@cloudflare/workers-types@4.20250628.0':
     resolution: {integrity: sha512-V4HthfhtQU2vTpwLeUic8FTLgGSjglsGZMJc9jKBNYEU/k0A1rE55UgQoTb5blKQdGtpQKfVKs3FROeY/lXmbw==}
@@ -641,8 +672,6 @@ snapshots:
 
   '@cloudflare/workerd-windows-64@1.20250617.0':
     optional: true
-
-  '@cloudflare/workers-types@4.20250603.0': {}
 
   '@cloudflare/workers-types@4.20250628.0':
     optional: true
