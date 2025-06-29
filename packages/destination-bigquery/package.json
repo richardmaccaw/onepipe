@@ -14,11 +14,11 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@maccman/web-auth-library": "^1.0.5",
-    "lodash": "^4.17.21",
+    "@maccman/web-auth-library": "catalog:",
+    "lodash": "catalog:",
     "@onepipe/core": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.8.3"
+    "typescript": "catalog:dev"
   }
 }

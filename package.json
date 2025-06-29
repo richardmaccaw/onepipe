@@ -3,15 +3,6 @@
   "type": "module",
   "version": "0.0.0",
   "private": true,
-  "catalogs": {
-    "default": {
-      "@hono/zod-validator": "^0.7.0",
-      "hono": "^4.8.3",
-      "lodash": "^4.17.21",
-      "uuid": "^11.1.0",
-      "zod": "^3.25.67"
-    }
-  },
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
@@ -21,20 +12,20 @@
     "build:destination-bigquery": "pnpm --filter @onepipe/destination-bigquery run build"
   },
   "devDependencies": {
-    "@types/lodash": "^4.17.19",
-    "@types/uuid": "^10.0.0", 
-    "typescript": "^5.8.3",
-    "wrangler": "^4.22.0"
+    "@types/lodash": "catalog:dev",
+    "@types/uuid": "catalog:dev", 
+    "typescript": "catalog:dev",
+    "wrangler": "catalog:dev"
   },
   "dependencies": {
-    "@hono/zod-validator": "^0.7.0",
-    "@maccman/web-auth-library": "^1.0.5",
+    "@hono/zod-validator": "catalog:",
+    "@maccman/web-auth-library": "catalog:",
     "@onepipe/core": "workspace:*",
     "@onepipe/destination-bigquery": "workspace:*",
-    "hono": "^4.8.3",
-    "lodash": "^4.17.21",
-    "uuid": "^11.1.0",
-    "web-auth-library": "^1.0.3",
-    "zod": "^3.25.67"
+    "hono": "catalog:",
+    "lodash": "catalog:",
+    "uuid": "catalog:",
+    "web-auth-library": "catalog:",
+    "zod": "catalog:"
   }
 }
