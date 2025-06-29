@@ -82,13 +82,13 @@ export interface TrackQueueMessage {
 
 export type QueueMessage = IdentifyQueueMessage | TrackQueueMessage
 
-export interface DestinationPluginInstance {
+export interface DestinationInstance {
   identify?(event: IdentifySystemEvent): Promise<void>
   track?(event: TrackSystemEvent): Promise<void>
   page?(event: PageSystemEvent): Promise<void>
 }
 
-export interface DestinationPlugin {
+export interface Destination {
   name: string
-  setup(env: Env): DestinationPluginInstance
+  setup(env: Env): DestinationInstance
 }

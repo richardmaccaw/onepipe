@@ -1,7 +1,7 @@
 import type { Env } from '../types'
 import type { IdentifySystemEvent, TrackSystemEvent } from '@onepipe/core'
 import type { QueueMessage } from '../types'
-import { triggerIdentify, triggerTrack } from '../plugin-loader'
+import { triggerIdentify, triggerTrack } from '../destination-loader'
 
 export async function safeConsumeMessage(message: Message<QueueMessage>, env: Env) {
   try {
