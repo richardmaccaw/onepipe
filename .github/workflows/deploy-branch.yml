@@ -8,83 +8,75 @@ on:
 jobs:
   generate-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        
-    - name: Setup Node.js & pnpm
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-    - uses: pnpm/action-setup@v2
-      with:
-        version: 8
-        
-    - name: Build packages
-      run: |
-        pnpm install
-        pnpm build
-        
-    - name: Create deployable version
-      run: |
-        # Create deploy directory with flattened structure
-        mkdir -p deploy/{src/lib/core,src/lib/destinations/bigquery}
-        
-        # Copy source files and built packages
-        cp -r src/* deploy/src/
-        cp packages/core/dist/index.* deploy/src/lib/core/
-        cp packages/destination-bigquery/dist/index.* deploy/src/lib/destinations/bigquery/
-        cp wrangler.toml onepipe.config.json deploy/
-        
-        # Transform imports: @onepipe/core -> ./lib/core
-        find deploy/src -name "*.ts" -exec sed -i.bak "s|@onepipe/core|./lib/core|g" {} \;
-        find deploy/src -name "*.ts" -exec sed -i.bak "s|@onepipe/destination-bigquery|./lib/destinations/bigquery|g" {} \;
-        find deploy -name "*.bak" -delete
-        
-        # Create minimal package.json - keep it simple
-        cat > deploy/package.json << 'EOF'
-        {
-          "name": "onepipe",
-          "type": "module",
-          "scripts": {
-            "deploy": "wrangler deploy",
-            "dev": "wrangler dev"
-          },
-          "dependencies": {
-            "@hono/zod-validator": "^0.7.0",
-            "@maccman/web-auth-library": "^1.0.5",
-            "hono": "^4.8.3",
-            "lodash": "^4.17.21",
-            "uuid": "^11.1.0",
-            "web-auth-library": "^1.0.3",
-            "zod": "^3.25.67"
-          },
-          "devDependencies": {
-            "wrangler": "^4.22.0"
-          }
-        }
-        EOF
-        
-        # Create deploy branch README
-        cat > deploy/README.md << 'EOF'
-        # OnePipe - Deploy Ready
-        
-        [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/richardmaccaw/onepipe/tree/deploy)
-        
-        > **Auto-generated from main branch** - [View source](https://github.com/richardmaccaw/onepipe/tree/main)
-        
-        Click the deploy button above for instant deployment to Cloudflare Workers.
-        EOF
-        
-    - name: Push to deploy branch
-      run: |
-        cd deploy
-        git init
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add .
-        git commit -m "Deploy version from main@${{ github.sha }}"
-        git push --force https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:deploy
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Create deployable version
+        run: |
+          # Create a minimal pnpm workspace that includes packages but no workspace protocol
+          cat > pnpm-workspace-deploy.yaml << 'EOF'
+          packages: []
+          EOF
+
+          # Append catalog section from original workspace
+          grep -A 100 "^catalog:" pnpm-workspace.yaml >> pnpm-workspace-deploy.yaml
+
+          # Install json utility if needed
+          npm install -g json
+
+          # Create flattened package.json by removing workspace dependencies
+          json -I -f package.json \
+            -e "delete this.dependencies['@onepipe/core']" \
+            -e "delete this.dependencies['@onepipe/destination-bigquery']" \
+            -e "this.scripts = {deploy: 'wrangler deploy', dev: 'wrangler dev'}"
+
+          # Move workspace file into place
+          mv pnpm-workspace-deploy.yaml pnpm-workspace.yaml
+
+          # Install to resolve all catalogs
+          pnpm install
+
+          # Remove workspace file (not needed in final deploy)
+          rm pnpm-workspace.yaml
+
+          # Add deploy-specific README
+          cat > README-DEPLOY.md << 'EOF'
+          # OnePipe - Deploy Branch
+
+          [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/richardmaccaw/onepipe/tree/deploy)
+
+          This is an auto-generated branch optimized for Cloudflare deployment.
+
+          **Source:** [main branch](https://github.com/richardmaccaw/onepipe)
+
+          ## Deployment
+
+          Click the button above or run:
+
+          ```bash
+          git clone -b deploy https://github.com/richardmaccaw/onepipe.git
+          cd onepipe
+          pnpm install
+          pnpm run deploy
+          ```
+          EOF
+
+      - name: Push to deploy branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Deploy version from main@${GITHUB_SHA::7}"
+          git push --force origin HEAD:deploy
