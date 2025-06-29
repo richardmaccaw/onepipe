@@ -5,8 +5,6 @@ compatibility_date = "2025-06-20"
 # # KV Namespace binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/kv
 [[kv_namespaces]]
   binding = "TOKEN_CACHE"
-  id = "ff34d1109f1340a9bed0fd859a42b45b"
-  preview_id = "ff34d1109f1340a9bed0fd859a42b45b"
 
 # # Durable Object binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/durable-objects
 # [[durable_objects]]
@@ -44,24 +42,10 @@ enabled = true
 
 [vars]
 # BigQuery configuration (non-sensitive)
-# Override these in environment-specific sections below
 BIGQUERY_PROJECT_ID = "your-project-id"
 BIGQUERY_DATASET_ID = "your-dataset-id"
 
-[env.staging]
-name = "onepipe-staging"
-[env.staging.vars]
-BIGQUERY_PROJECT_ID = "your-project-id"
-BIGQUERY_DATASET_ID = "your-dataset-id"
-
-[env.production]  
-name = "onepipe-production"
-[env.production.vars]
-BIGQUERY_PROJECT_ID = "your-project-id"
-BIGQUERY_DATASET_ID = "your-dataset-id"
 
 # Secrets (set via wrangler CLI):
 # wrangler secret put GOOGLE_CLOUD_CREDENTIALS
-# wrangler secret put GOOGLE_CLOUD_CREDENTIALS --env staging  
-# wrangler secret put GOOGLE_CLOUD_CREDENTIALS --env production
 
