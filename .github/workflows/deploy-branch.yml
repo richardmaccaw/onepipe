@@ -1,0 +1,82 @@
+name: Generate Deploy Branch
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  generate-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Create deployable version
+        run: |
+          # Create a minimal pnpm workspace that includes packages but no workspace protocol
+          cat > pnpm-workspace-deploy.yaml << 'EOF'
+          packages: []
+          EOF
+
+          # Append catalog section from original workspace
+          grep -A 100 "^catalog:" pnpm-workspace.yaml >> pnpm-workspace-deploy.yaml
+
+          # Install json utility if needed
+          npm install -g json
+
+          # Create flattened package.json by removing workspace dependencies
+          json -I -f package.json \
+            -e "delete this.dependencies['@onepipe/core']" \
+            -e "delete this.dependencies['@onepipe/destination-bigquery']" \
+            -e "this.scripts = {deploy: 'wrangler deploy', dev: 'wrangler dev'}"
+
+          # Move workspace file into place
+          mv pnpm-workspace-deploy.yaml pnpm-workspace.yaml
+
+          # Install to resolve all catalogs
+          pnpm install
+
+          # Remove workspace file (not needed in final deploy)
+          rm pnpm-workspace.yaml
+
+          # Add deploy-specific README
+          cat > README-DEPLOY.md << 'EOF'
+          # OnePipe - Deploy Branch
+
+          [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/richardmaccaw/onepipe/tree/deploy)
+
+          This is an auto-generated branch optimized for Cloudflare deployment.
+
+          **Source:** [main branch](https://github.com/richardmaccaw/onepipe)
+
+          ## Deployment
+
+          Click the button above or run:
+
+          ```bash
+          git clone -b deploy https://github.com/richardmaccaw/onepipe.git
+          cd onepipe
+          pnpm install
+          pnpm run deploy
+          ```
+          EOF
+
+      - name: Push to deploy branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Deploy version from main@${GITHUB_SHA::7}"
+          git push --force origin HEAD:deploy
