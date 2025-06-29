@@ -1,25 +1,26 @@
-# OnePipe - Deploy to Cloudflare
+# OnePipe - Open Source Segment Alternative
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/YOUR_USERNAME/onepipe-template)
 
 ## One-Click Deployment
 
-Click the button above to deploy your own OnePipe analytics infrastructure to Cloudflare Workers.
+Click the **Deploy to Cloudflare Workers** button above to deploy your own OnePipe analytics infrastructure.
 
 ### What gets deployed:
 
-1. **Cloudflare Worker** - Handles HTTP requests and queues events
-2. **KV Namespace** - Caches authentication tokens
-3. **Queue** - Processes events asynchronously
+1. **Cloudflare Worker** - Handles HTTP requests and queues events  
+2. **KV Namespace** - Caches authentication tokens (auto-created)
+3. **Queue** - Processes events asynchronously (auto-created)
 4. **Setup Interface** - Guided configuration for destinations
 
 ### After deployment:
 
-1. Visit your worker URL + `/setup` with the setup token
-2. Choose your destinations (BigQuery, etc.)
-3. Complete OAuth authentication
-4. Configure project/dataset settings
-5. Start sending events!
+1. Note the **setup token** from the deployment logs
+2. Visit your worker URL at `/setup?token=YOUR_SETUP_TOKEN`
+3. Choose your destinations (BigQuery, etc.)
+4. Complete OAuth authentication
+5. Configure project/dataset settings
+6. Start sending events!
 
 ## Manual Deployment
 
@@ -30,15 +31,13 @@ If you prefer to deploy manually:
 git clone https://github.com/YOUR_USERNAME/onepipe-template.git
 cd onepipe-template
 
-# Install dependencies
+# Install dependencies (generates setup token)
 npm install
 
-# Set up Google OAuth (optional, can be done later)
-export GOOGLE_OAUTH_CLIENT_ID="your-client-id"
-export GOOGLE_OAUTH_CLIENT_SECRET="your-client-secret"
+# Deploy to Cloudflare
+npx wrangler deploy
 
-# Deploy
-node deploy.js
+# Check logs for your setup token
 ```
 
 ## Environment Variables

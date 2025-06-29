@@ -1,25 +1,18 @@
-name: Deploy OnePipe to Cloudflare Workers
+name: Deploy OnePipe
 
 on:
   workflow_dispatch:
-    inputs:
-      google_oauth_client_id:
-        description: 'Google OAuth Client ID (optional)'
-        required: false
-        type: string
-      google_oauth_client_secret:
-        description: 'Google OAuth Client Secret (optional)'
-        required: false
-        type: string
+  push:
+    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    name: Deploy OnePipe
+    name: Deploy OnePipe to Cloudflare Workers
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup Node.js
+      - name: Setup Node.js  
         uses: actions/setup-node@v4
         with:
           node-version: '18'
@@ -32,13 +25,16 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy
-        env:
-          GOOGLE_OAUTH_CLIENT_ID: ${{ inputs.google_oauth_client_id }}
-          GOOGLE_OAUTH_CLIENT_SECRET: ${{ inputs.google_oauth_client_secret }}
           
-      - name: Output deployment info
+      - name: Show setup information
         run: |
           echo "🎉 OnePipe deployed successfully!"
-          echo "Visit your worker URL /setup to complete configuration"
-          echo "Make sure to set up Google OAuth credentials if you haven't already"
+          echo ""
+          echo "Next steps:"
+          echo "1. Your setup token is in the .setup-token file"
+          echo "2. Visit your worker URL /setup to complete configuration"
+          echo "3. Configure Google OAuth credentials in the Cloudflare dashboard if needed"
+          if [ -f .setup-token ]; then
+            echo ""
+            echo "Setup token: $(cat .setup-token)"
+          fi
