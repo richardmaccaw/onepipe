@@ -3,7 +3,7 @@
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "node",
-    "lib": ["ES2020"],
+    "lib": ["ES2020", "WebWorker"],
     "outDir": "./dist",
     "declaration": true,
     "declarationMap": true,
@@ -14,12 +14,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "types": ["@cloudflare/workers-types"]
+    "isolatedModules": true
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "../../worker-configuration.d.ts"
   ],
   "exclude": [
     "dist",
