@@ -81,11 +81,25 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 }
 ```
 
-**Environment Variables (Cloudflare Secrets)**
+**Environment Variables**
 
+Non-sensitive variables (set in wrangler.toml [vars] sections):
 - `BIGQUERY_PROJECT_ID` - BigQuery project identifier
 - `BIGQUERY_DATASET_ID` - BigQuery dataset identifier
+
+Sensitive secrets (set via wrangler CLI):
 - `GOOGLE_CLOUD_CREDENTIALS` - Service account JSON (base64 encoded)
+
+**Environment Setup**
+
+1. **Local Development**: Copy `.env.example` to `.env` and fill in values
+2. **Production Secrets**: Use wrangler CLI to set sensitive values:
+   ```bash
+   wrangler secret put GOOGLE_CLOUD_CREDENTIALS
+   wrangler secret put GOOGLE_CLOUD_CREDENTIALS --env staging  
+   wrangler secret put GOOGLE_CLOUD_CREDENTIALS --env production
+   ```
+3. **Dashboard Alternative**: Set secrets via [Cloudflare Dashboard](https://developers.cloudflare.com/workers/configuration/environment-variables/#add-environment-variables-via-the-dashboard) under Workers & Pages > Your Worker > Settings > Variables
 
 **Infrastructure (`wrangler.toml`)**
 

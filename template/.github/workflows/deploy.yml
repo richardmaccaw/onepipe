@@ -1,0 +1,40 @@
+name: Deploy OnePipe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy OnePipe to Cloudflare Workers
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js  
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          
+      - name: Show setup information
+        run: |
+          echo "🎉 OnePipe deployed successfully!"
+          echo ""
+          echo "Next steps:"
+          echo "1. Your setup token is in the .setup-token file"
+          echo "2. Visit your worker URL /setup to complete configuration"
+          echo "3. Configure Google OAuth credentials in the Cloudflare dashboard if needed"
+          if [ -f .setup-token ]; then
+            echo ""
+            echo "Setup token: $(cat .setup-token)"
+          fi

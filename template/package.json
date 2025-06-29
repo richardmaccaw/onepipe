@@ -1,0 +1,41 @@
+{
+  "name": "onepipe-template",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Template for deploying OnePipe analytics infrastructure",
+  "main": "src/worker.ts",
+  "scripts": {
+    "postinstall": "node -e \"const crypto = require('crypto'); const fs = require('fs'); const token = crypto.randomUUID(); const toml = fs.readFileSync('wrangler.toml', 'utf8'); const updated = toml.replace('SETUP_MODE = \\\"true\\\"', 'SETUP_MODE = \\\"true\\\"\\nSETUP_TOKEN = \\\"' + token + '\\\"'); fs.writeFileSync('wrangler.toml', updated); fs.writeFileSync('.setup-token', token); console.log('\\n🔑 OnePipe Setup Token Generated!\\nToken:', token, '\\n\\nAfter deployment:\\n1. Visit: https://your-worker.your-subdomain.workers.dev/setup\\n2. Use Bearer token: Authorization: Bearer ' + token);\"",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "build": "echo 'No build step required'"
+  },
+  "keywords": [
+    "analytics",
+    "segment",
+    "bigquery",
+    "cloudflare-workers"
+  ],
+  "author": "OnePipe",
+  "license": "MIT",
+  "dependencies": {
+    "@hono/zod-validator": "^0.2.0",
+    "@maccman/web-auth-library": "^1.0.0",
+    "@onepipe/core": "workspace:*",
+    "@onepipe/destination-bigquery": "workspace:*",
+    "hono": "^4.0.0",
+    "lodash": "^4.17.21",
+    "uuid": "^9.0.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.0",
+    "@types/uuid": "^9.0.0",
+    "typescript": "^5.0.0",
+    "wrangler": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/onepipe-template.git"
+  }
+}

@@ -3,7 +3,7 @@
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "node",
-    "lib": ["ES2020", "WebWorker"],
+    "lib": ["ES2020", "DOM"],
     "outDir": "./dist",
     "declaration": true,
     "declarationMap": true,
@@ -14,12 +14,15 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "baseUrl": ".",
+    "paths": {
+      "@onepipe/core": ["../core"]
+    }
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx",
-    "../../worker-configuration.d.ts"
+    "**/*.tsx"
   ],
   "exclude": [
     "dist",

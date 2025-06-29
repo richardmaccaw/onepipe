@@ -1,53 +1,92 @@
-# Segment Cloudflare Worker
+# OnePipe
 
-This Cloudflare Worker is designed to receive Segment events and send them to Google's BigQuery. It provides a SegmentJS compatible HTTP interface for receiving events.
-Endpoints
+Open-source Segment alternative built on Cloudflare Workers with a plugin-based architecture.
 
-The worker exposes several endpoints for different types of events:
+## Quick Start
 
-- `POST /t` and `POST /track`: These endpoints are used to track events. They expect a JSON payload conforming to the TrackEvent schema defined in src/types.ts.
+### Option 1: Deploy to Cloudflare (Recommended)
 
-- `POST /i` and `POST /identify`: These endpoints are used to identify users. They expect a JSON payload conforming to the IdentifyEvent schema defined in src/types.ts.
+Click the deploy button to get started in seconds:
 
-- `POST /p` and `POST /page`: These endpoints are used to track page views. They expect a JSON payload conforming to the PageEvent schema defined in src/types.ts.
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/YOUR_USERNAME/onepipe-template)
 
-- `OPTIONS`: This endpoint is used for handling CORS preflight requests.
+### Option 2: Manual Setup
 
-If a request is made to an endpoint that is not defined, the worker will return a 404 response.
-Event Processing
+1. Clone this repository
+2. Install dependencies: `pnpm install`
+3. Configure environment variables (see below)
+4. Deploy: `pnpm run deploy`
 
-When an event is received, it is first validated against the appropriate schema. If the event is valid, it is then enqueued for processing. The worker processes events in batches, consuming them from the queue and sending them to BigQuery.
+## Configuration
 
-The worker ensures that the appropriate table and schema exist in BigQuery before inserting the event. If the table or schema does not exist, it is created.
+### Environment Variables
 
-## Environment Variables
+Set these in your Cloudflare Worker dashboard or via `wrangler secret put`:
 
-The worker requires several environment variables to be set:
+**Required:**
+- `GOOGLE_CLOUD_CREDENTIALS` - Base64 encoded service account JSON
+- `BIGQUERY_PROJECT_ID` - Your BigQuery project ID
+- `BIGQUERY_DATASET_ID` - Your BigQuery dataset ID
 
-- `BIGQUERY_PROJECT_ID`: The ID of your BigQuery project.
-- `BIGQUERY_DATASET_ID`: The ID of your BigQuery dataset.
-- `GOOGLE_CLOUD_CREDENTIALS`: Your Google Cloud credentials.
-  Deployment
+**Optional:**
+- `SETUP_MODE` - Set to `"true"` to enable setup UI
+- `SETUP_TOKEN` - Bearer token for setup authentication
 
-The worker can be deployed using Cloudflare's wrangler CLI. Run `pnpm run deploy` to publish your worker.
-Development
+### Setup UI
 
-To start a development server, run `pnpm dev`. This will start a local server at http://localhost:8787/ where you can interact with your worker.
-Testing
+After deployment, if `SETUP_MODE=true`, visit `https://your-worker.workers.dev/setup` to:
 
-Tests can be run using vitest. Run `pnpm test` to execute your tests.
+1. Complete OAuth flow with Google
+2. Auto-discover BigQuery projects and datasets
+3. Test your configuration
 
-## Setup
+Access requires Bearer token authentication:
+```bash
+curl -H "Authorization: Bearer YOUR_SETUP_TOKEN" https://your-worker.workers.dev/setup
+```
 
-- [] Install [pnpm](https://pnpm.io/) and [wrangler](https://developers.cloudflare.com/workers/cli-wrangler/install-update)
-- [] Run `pnpm install` to install dependencies
-- [] Run `wrangler config` to configure wrangler
-- [] Run `wrangler secret put BIGQUERY_PROJECT_ID` to set the project ID
-- [] Run `wrangler secret put BIGQUERY_DATASET_ID` to set the dataset ID
-- [] Run `wrangler secret put GOOGLE_CLOUD_CREDENTIALS` to set the Google Cloud credentials
-- [] Run `wrangler kv:namespace create "GOOGLE_TOKENS"` to create a KV namespace and update `wrangler.toml` with the namespace ID
-- [] Run `wrangler queues create onepipe-queue` to create a queue and update `wrangler.toml` with the queue ID
-- [] Run `wrangler publish` to publish the worker
+## API Endpoints
+
+OnePipe provides full Segment HTTP API compatibility:
+
+- `POST /t` or `/track` - Track events
+- `POST /i` or `/identify` - Identify users  
+- `POST /p` or `/page` - Page views
+- `OPTIONS` - CORS preflight handling
+
+## Architecture
+
+**Event Flow:**
+1. HTTP Request → Route handler validates event schema
+2. Queue → Event enqueued for async processing
+3. Consumer → Processes events in batches
+4. Plugin System → Routes to configured destination plugins
+5. BigQuery → Auto-creates tables and inserts events
+
+**Plugin System:**
+- Configuration-driven loading via `onepipe.config.json`
+- Standardized `DestinationPlugin` interface
+- Support for multiple destinations simultaneously
+
+## Development
+
+### Commands
+
+- `pnpm dev` - Start local development server
+- `pnpm build` - Build all packages
+- `pnpm check:types` - Run TypeScript type checking
+- `pnpm run deploy` - Deploy to Cloudflare Workers
+
+### Infrastructure Setup
+
+Create required Cloudflare resources:
+
+```bash
+wrangler kv:namespace create "GOOGLE_TOKENS"
+wrangler queues create onepipe-queue
+```
+
+Update `wrangler.toml` with the generated IDs.
 
 ## Recording events
 

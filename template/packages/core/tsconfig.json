@@ -18,8 +18,7 @@
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx",
-    "../../worker-configuration.d.ts"
+    "**/*.tsx"
   ],
   "exclude": [
     "dist",

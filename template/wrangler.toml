@@ -1,0 +1,34 @@
+name = "onepipe"
+main = "src/worker.ts"
+compatibility_date = "2025-06-20"
+
+# KV Namespace binding - automatically created by deploy button
+[[kv_namespaces]]
+binding = "TOKEN_CACHE"
+preview_id = ""
+
+# Queue binding - automatically created by deploy button  
+[[queues.producers]]
+queue = "onepipe-queue"
+binding = "QUEUE"
+
+[[queues.consumers]]
+queue = "onepipe-queue"
+max_batch_size = 10
+max_batch_timeout = 5
+
+[observability.logs]
+enabled = true
+
+# Environment Variables
+[vars]
+# Setup mode - enabled by default for first-time setup
+SETUP_MODE = "true"
+
+# OAuth configuration (can be set after deployment)
+GOOGLE_OAUTH_CLIENT_ID = ""
+GOOGLE_OAUTH_CLIENT_SECRET = ""
+
+# BigQuery configuration (set during setup process)
+BIGQUERY_PROJECT_ID = ""
+BIGQUERY_DATASET_ID = ""
