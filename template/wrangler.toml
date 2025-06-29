@@ -1,0 +1,52 @@
+name = "onepipe-${RANDOM_ID}"
+main = "src/worker.ts"
+compatibility_date = "2025-06-20"
+
+# KV Namespace binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/kv
+[[kv_namespaces]]
+binding = "TOKEN_CACHE"
+id = "${TOKEN_CACHE_ID}"
+preview_id = "${TOKEN_CACHE_PREVIEW_ID}"
+
+# Queue binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/queues
+[[queues.producers]]
+queue = "onepipe-queue-${RANDOM_ID}"
+binding = "QUEUE"
+
+[[queues.consumers]]
+queue = "onepipe-queue-${RANDOM_ID}"
+max_batch_size = 10 # optional: defaults to 10
+max_batch_timeout = 5 # optional: defaults to 5 seconds
+
+[observability.logs]
+enabled = true
+
+# Environment Variables
+[vars]
+# Setup mode - will be disabled after configuration
+SETUP_MODE = "true"
+SETUP_TOKEN = "${SETUP_TOKEN}"
+
+# OAuth configuration (these will be set by deploy button)
+GOOGLE_OAUTH_CLIENT_ID = "${GOOGLE_OAUTH_CLIENT_ID}"
+GOOGLE_OAUTH_CLIENT_SECRET = "${GOOGLE_OAUTH_CLIENT_SECRET}"
+
+# BigQuery configuration (will be set during setup)
+BIGQUERY_PROJECT_ID = ""
+BIGQUERY_DATASET_ID = ""
+
+# Environment-specific configuration
+[env.staging]
+name = "onepipe-staging-${RANDOM_ID}"
+[env.staging.vars]
+SETUP_MODE = "true"
+SETUP_TOKEN = "${SETUP_TOKEN}"
+BIGQUERY_PROJECT_ID = ""
+BIGQUERY_DATASET_ID = ""
+
+[env.production]
+name = "onepipe-production-${RANDOM_ID}"
+[env.production.vars]
+SETUP_MODE = "false"  # Production should not be in setup mode by default
+BIGQUERY_PROJECT_ID = ""
+BIGQUERY_DATASET_ID = ""

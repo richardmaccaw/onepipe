@@ -1,0 +1,44 @@
+name: Deploy OnePipe to Cloudflare Workers
+
+on:
+  workflow_dispatch:
+    inputs:
+      google_oauth_client_id:
+        description: 'Google OAuth Client ID (optional)'
+        required: false
+        type: string
+      google_oauth_client_secret:
+        description: 'Google OAuth Client Secret (optional)'
+        required: false
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy OnePipe
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+        env:
+          GOOGLE_OAUTH_CLIENT_ID: ${{ inputs.google_oauth_client_id }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ inputs.google_oauth_client_secret }}
+          
+      - name: Output deployment info
+        run: |
+          echo "🎉 OnePipe deployed successfully!"
+          echo "Visit your worker URL /setup to complete configuration"
+          echo "Make sure to set up Google OAuth credentials if you haven't already"
