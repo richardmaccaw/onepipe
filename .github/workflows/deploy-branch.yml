@@ -1,0 +1,297 @@
+name: Generate Deploy Branch
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  generate-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout main branch
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+        
+    - name: Install dependencies
+      run: pnpm install
+      
+    - name: Build packages
+      run: pnpm build
+      
+    - name: Create deployable structure
+      run: |
+        # Create temporary directory for deployable version
+        mkdir -p deploy-temp/src
+        
+        # Copy main source files (TypeScript)
+        cp -r src/* deploy-temp/src/
+        
+        # Create lib directory for flattened packages
+        mkdir -p deploy-temp/src/lib
+        
+        # Copy built core package (only essential files)
+        mkdir -p deploy-temp/src/lib/core
+        cp packages/core/dist/index.js deploy-temp/src/lib/core/
+        cp packages/core/dist/index.d.ts deploy-temp/src/lib/core/
+        cp packages/core/dist/types.js deploy-temp/src/lib/core/
+        cp packages/core/dist/types.d.ts deploy-temp/src/lib/core/
+        cp packages/core/dist/lib.js deploy-temp/src/lib/core/
+        cp packages/core/dist/lib.d.ts deploy-temp/src/lib/core/
+        cp packages/core/dist/env.js deploy-temp/src/lib/core/
+        cp packages/core/dist/env.d.ts deploy-temp/src/lib/core/
+        
+        # Copy built destination-bigquery package (only essential files)
+        mkdir -p deploy-temp/src/lib/destinations/bigquery
+        cp packages/destination-bigquery/dist/index.js deploy-temp/src/lib/destinations/bigquery/
+        cp packages/destination-bigquery/dist/index.d.ts deploy-temp/src/lib/destinations/bigquery/
+        
+        # Copy configuration files
+        cp wrangler.toml deploy-temp/
+        cp onepipe.config.json deploy-temp/
+        cp worker-configuration.d.ts deploy-temp/
+        
+        echo "✅ Created deployable structure"
+        
+    - name: Transform package.json
+      run: |
+        cd deploy-temp
+        
+        # Create Node.js script to transform package.json
+        cat > transform-package.js << 'EOF'
+        const fs = require('fs');
+        const path = require('path');
+        
+        // Read original package.json
+        const originalPkg = JSON.parse(fs.readFileSync('../package.json', 'utf8'));
+        const workspace = JSON.parse(fs.readFileSync('../pnpm-workspace.yaml', 'utf8'));
+        
+        // Create new package.json without workspace dependencies
+        const newPkg = {
+          ...originalPkg,
+          dependencies: {
+            ...originalPkg.dependencies
+          }
+        };
+        
+        // Remove workspace dependencies
+        delete newPkg.dependencies['@onepipe/core'];
+        delete newPkg.dependencies['@onepipe/destination-bigquery'];
+        
+        // Resolve catalog references to exact versions
+        const catalogs = workspace.catalogs?.default || {};
+        const devCatalogs = workspace.catalogs?.dev || {};
+        
+        // Replace catalog references with exact versions
+        Object.keys(newPkg.dependencies).forEach(dep => {
+          if (newPkg.dependencies[dep].startsWith('catalog:')) {
+            const catalogKey = newPkg.dependencies[dep].replace('catalog:', '');
+            if (catalogs[dep]) {
+              newPkg.dependencies[dep] = catalogs[dep];
+            }
+          }
+        });
+        
+        // Update devDependencies catalog references
+        Object.keys(newPkg.devDependencies || {}).forEach(dep => {
+          if (newPkg.devDependencies[dep].startsWith('catalog:')) {
+            const catalogKey = newPkg.devDependencies[dep].replace('catalog:dev', '');
+            if (devCatalogs[dep]) {
+              newPkg.devDependencies[dep] = devCatalogs[dep];
+            }
+          }
+        });
+        
+        // Simplify build scripts
+        newPkg.scripts = {
+          ...newPkg.scripts,
+          build: 'echo "No build needed - already built"'
+        };
+        
+        // Write transformed package.json
+        fs.writeFileSync('package.json', JSON.stringify(newPkg, null, 2));
+        console.log('✅ Transformed package.json');
+        EOF
+        
+        node transform-package.js
+        
+    - name: Transform imports
+      run: |
+        cd deploy-temp
+        
+        # Create Node.js script to transform imports in TypeScript files
+        cat > transform-imports.js << 'EOF'
+        const fs = require('fs');
+        const path = require('path');
+        
+        function transformFile(filePath) {
+          // Handle both .ts and .js files, but skip .d.ts files
+          if (!fs.existsSync(filePath) || 
+              (!filePath.endsWith('.ts') && !filePath.endsWith('.js')) ||
+              filePath.endsWith('.d.ts')) {
+            return;
+          }
+          
+          let content = fs.readFileSync(filePath, 'utf8');
+          let changed = false;
+          
+          // Transform @onepipe/core imports - use relative path based on file location
+          if (content.includes('@onepipe/core')) {
+            const relativePath = getRelativePathToLib(filePath);
+            content = content.replace(
+              /from\s+['"]@onepipe\/core['"]/g,
+              `from '${relativePath}lib/core'`
+            );
+            content = content.replace(
+              /import\(['"]@onepipe\/core['"]\)/g,
+              `import('${relativePath}lib/core')`
+            );
+            changed = true;
+          }
+          
+          // Transform @onepipe/destination-bigquery imports
+          if (content.includes('@onepipe/destination-bigquery')) {
+            const relativePath = getRelativePathToLib(filePath);
+            content = content.replace(
+              /from\s+['"]@onepipe\/destination-bigquery['"]/g,
+              `from '${relativePath}lib/destinations/bigquery'`
+            );
+            content = content.replace(
+              /import\(['"]@onepipe\/destination-bigquery['"]\)/g,
+              `import('${relativePath}lib/destinations/bigquery')`
+            );
+            changed = true;
+          }
+          
+          if (changed) {
+            fs.writeFileSync(filePath, content);
+            console.log(`✅ Transformed imports in ${filePath}`);
+          }
+        }
+        
+        function getRelativePathToLib(filePath) {
+          // Count directory depth from src/ to determine relative path
+          const relativeParts = path.relative('src', path.dirname(filePath)).split(path.sep);
+          const depth = relativeParts[0] === '' ? 0 : relativeParts.length;
+          return depth === 0 ? './' : '../'.repeat(depth);
+        }
+        
+        function walkDirectory(dir) {
+          const files = fs.readdirSync(dir);
+          
+          files.forEach(file => {
+            const filePath = path.join(dir, file);
+            const stat = fs.statSync(filePath);
+            
+            if (stat.isDirectory()) {
+              walkDirectory(filePath);
+            } else {
+              transformFile(filePath);
+            }
+          });
+        }
+        
+        walkDirectory('src');
+        console.log('✅ Import transformation completed');
+        EOF
+        
+        node transform-imports.js
+        
+    - name: Create deploy branch README
+      run: |
+        cd deploy-temp
+        cat > README.md << 'EOF'
+        # OnePipe - Deploy Branch
+        
+        [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/richardmaccaw/onepipe/tree/deploy)
+        
+        > ⚠️ **This is an auto-generated branch** - Do not edit files directly here!
+        
+        This branch contains a flattened, deployable version of OnePipe that works with Cloudflare's deploy button.
+        
+        ## Quick Deploy
+        
+        Click the deploy button above to instantly deploy OnePipe to Cloudflare Workers.
+        
+        ## Development
+        
+        To contribute to OnePipe, please use the main repository branch:
+        
+        **👉 [Switch to main branch for development](https://github.com/richardmaccaw/onepipe/tree/main)**
+        
+        ## About This Branch
+        
+        - **Purpose**: Cloudflare deploy button compatibility
+        - **Generated**: Automatically from main branch
+        - **Structure**: Flattened monorepo with resolved dependencies
+        - **Updates**: Synced on every push to main
+        
+        ## Architecture
+        
+        This deployable version contains:
+        - Core OnePipe worker code
+        - Built-in BigQuery destination
+        - All dependencies resolved
+        - Simplified build process
+        
+        For the full development setup with multiple packages, see the [main branch](https://github.com/richardmaccaw/onepipe).
+        EOF
+        
+    - name: Configure git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+    - name: Create/update deploy branch
+      run: |
+        # Check if deploy branch exists
+        if git show-ref --verify --quiet refs/remotes/origin/deploy; then
+          echo "Deploy branch exists, checking out..."
+          git checkout deploy
+        else
+          echo "Creating new deploy branch..."
+          git checkout --orphan deploy
+          git rm -rf .
+        fi
+        
+        # Copy all files from deploy-temp
+        cp -r deploy-temp/* .
+        cp deploy-temp/.* . 2>/dev/null || true
+        
+        # Add all files
+        git add .
+        
+        # Check if there are changes to commit
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Auto-generated deploy version from main@${{ github.sha }}
+
+          Generated from: ${{ github.ref }}
+          Commit: ${{ github.sha }}
+          
+          This is an automatically generated deployable version.
+          Do not edit files in this branch directly.
+          "
+          
+          git push origin deploy --force
+          echo "✅ Deploy branch updated successfully"
+        fi
+        
+    - name: Cleanup
+      run: |
+        rm -rf deploy-temp
+        echo "✅ Cleanup completed"

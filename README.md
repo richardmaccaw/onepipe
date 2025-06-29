@@ -8,7 +8,9 @@ Open-source Segment alternative built on Cloudflare Workers with a plugin-based 
 
 Click the deploy button to get started in seconds:
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/richardmaccaw/onepipe)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/richardmaccaw/onepipe/tree/deploy)
+
+> **Note**: The deploy button uses our auto-generated `deploy` branch which contains a flattened version compatible with Cloudflare's deployment system.
 
 ### Option 2: Manual Setup
 
