@@ -7,9 +7,7 @@
   // KV Namespace binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/kv
   "kv_namespaces": [
     {
-      "binding": "TOKEN_CACHE",
-      "id": "placeholder",
-      "preview_id": "placeholder"
+      "binding": "TOKEN_CACHE"
     }
   ],
 
@@ -41,36 +39,20 @@
 
   // Queue binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/queues
   "queues": {
-    "producers": [
-      {
-        "queue": "onepipe-queue",
-        "binding": "QUEUE"
-      }
-    ],
-    "consumers": [
-      {
-        "queue": "onepipe-queue",
-        "max_batch_size": 10, // optional: defaults to 10
-        "max_batch_timeout": 5 // optional: defaults to 5 seconds
-      }
-    ]
+    "producer": {
+      "binding": "QUEUE",
+      "queue": "onepipe-queue"
+    },
+    "consumer": {
+      "queue": "onepipe-queue",
+      "max_batch_size": 10,
+      "max_batch_timeout": 5
+    }
   },
 
   "observability": {
     "logs": {
       "enabled": true
     }
-  },
-
-  // Environment Variables
-  // Non-sensitive variables can be set in vars sections
-  // Sensitive secrets should use: wrangler secret put SECRET_NAME
-  "vars": {
-    // BigQuery configuration (non-sensitive)
-    "BIGQUERY_PROJECT_ID": "your-project-id",
-    "BIGQUERY_DATASET_ID": "your-dataset-id"
   }
-
-  // Secrets (set via wrangler CLI):
-  // wrangler secret put GOOGLE_CLOUD_CREDENTIALS
 }
