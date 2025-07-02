@@ -36,7 +36,8 @@ jobs:
           EOF
 
           # Append catalog section from original workspace
-          grep -A 100 "^catalogs:" pnpm-workspace.yaml >> pnpm-workspace-deploy.yaml
+          echo "" >> pnpm-workspace-deploy.yaml
+          sed -n '/^catalogs:/,$p' pnpm-workspace.yaml >> pnpm-workspace-deploy.yaml
 
           # Create flattened package.json by removing workspace dependencies
           json -I -f package.json \
@@ -48,7 +49,7 @@ jobs:
           mv pnpm-workspace-deploy.yaml pnpm-workspace.yaml
 
           # Install to resolve all catalogs
-          pnpm install
+          pnpm install --no-frozen-lockfile
 
           # Remove workspace file (not needed in final deploy)
           rm pnpm-workspace.yaml
@@ -65,7 +66,6 @@ jobs:
           EOF
 
       - name: Push to deploy branch
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
