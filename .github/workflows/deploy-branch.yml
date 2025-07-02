@@ -48,8 +48,11 @@ jobs:
           # Move workspace file into place
           mv pnpm-workspace-deploy.yaml pnpm-workspace.yaml
 
-          # Install to resolve all catalogs
+          # First install to resolve catalogs
           pnpm install --no-frozen-lockfile
+
+          # Now update package.json to use resolved versions instead of catalog: references
+          pnpm install --no-frozen-lockfile --update-lockfile-only
 
           # Remove workspace file (not needed in final deploy)
           rm pnpm-workspace.yaml
