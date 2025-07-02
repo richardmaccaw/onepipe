@@ -3,6 +3,8 @@ name: Generate Deploy Branch
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -63,6 +65,7 @@ jobs:
           EOF
 
       - name: Push to deploy branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
