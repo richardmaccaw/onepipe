@@ -23,6 +23,11 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Build packages
+        run: |
+          pnpm install
+          pnpm build
+
       - name: Create deployable version
         run: |
           # Create a minimal pnpm workspace that includes packages but no workspace protocol
@@ -51,26 +56,26 @@ jobs:
           # Remove workspace file (not needed in final deploy)
           rm pnpm-workspace.yaml
 
+          # Create flattened file structure with built packages
+          mkdir -p src/lib/core src/lib/destinations/bigquery
+          cp packages/core/dist/index.* src/lib/core/
+          cp packages/destination-bigquery/dist/index.* src/lib/destinations/bigquery/
+          cp wrangler.toml onepipe.config.json worker-configuration.d.ts .
+
+          # Transform imports to use local files
+          find src -name "*.ts" -exec sed -i.bak "s|@onepipe/core|./lib/core|g" {} \;
+          find src -name "*.ts" -exec sed -i.bak "s|@onepipe/destination-bigquery|./lib/destinations/bigquery|g" {} \;
+          find src -name "*.bak" -delete
+
           # Add deploy-specific README
-          cat > README-DEPLOY.md << 'EOF'
-          # OnePipe - Deploy Branch
+          cat > README.md << 'EOF'
+          # OnePipe - Deploy Ready
 
           [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/richardmaccaw/onepipe/tree/deploy)
 
-          This is an auto-generated branch optimized for Cloudflare deployment.
+          > **Auto-generated from main branch** - [View source](https://github.com/richardmaccaw/onepipe/tree/main)
 
-          **Source:** [main branch](https://github.com/richardmaccaw/onepipe)
-
-          ## Deployment
-
-          Click the button above or run:
-
-          ```bash
-          git clone -b deploy https://github.com/richardmaccaw/onepipe.git
-          cd onepipe
-          pnpm install
-          pnpm run deploy
-          ```
+          Click the deploy button above for instant deployment to Cloudflare Workers.
           EOF
 
       - name: Push to deploy branch
