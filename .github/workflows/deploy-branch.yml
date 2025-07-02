@@ -25,37 +25,64 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install json utility
-        run: npm install -g json
+      - name: Install dependencies
+        run: |
+          npm install -g json
+          npm install -g js-yaml
 
       - name: Create deployable version
         run: |
-          # Create a minimal pnpm workspace that includes packages but no workspace protocol
-          cat > pnpm-workspace-deploy.yaml << 'EOF'
-          packages: []
+          # Parse catalogs from pnpm-workspace.yaml and replace catalog references
+          node << 'EOF'
+          const fs = require('fs');
+          const yaml = require('js-yaml');
+
+          // Read workspace file
+          const workspace = yaml.load(fs.readFileSync('pnpm-workspace.yaml', 'utf8'));
+          const catalogs = workspace.catalogs || {};
+
+          // Read package.json
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+
+          // Replace catalog references in dependencies
+          for (const [name, version] of Object.entries(pkg.dependencies || {})) {
+            if (version === 'catalog:') {
+              pkg.dependencies[name] = catalogs.default[name] || version;
+            } else if (version.startsWith('catalog:')) {
+              const catalogName = version.split(':')[1];
+              pkg.dependencies[name] = catalogs[catalogName]?.[name] || version;
+            }
+          }
+
+          // Replace catalog references in devDependencies
+          for (const [name, version] of Object.entries(pkg.devDependencies || {})) {
+            if (version === 'catalog:') {
+              pkg.devDependencies[name] = catalogs.default[name] || version;
+            } else if (version.startsWith('catalog:')) {
+              const catalogName = version.split(':')[1];
+              pkg.devDependencies[name] = catalogs[catalogName]?.[name] || version;
+            }
+          }
+
+          // Remove workspace dependencies
+          delete pkg.dependencies['@onepipe/core'];
+          delete pkg.dependencies['@onepipe/destination-bigquery'];
+
+          // Update scripts
+          pkg.scripts = {
+            deploy: 'wrangler deploy',
+            dev: 'wrangler dev'
+          };
+
+          // Write updated package.json
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
           EOF
 
-          # Append catalog section from original workspace
-          echo "" >> pnpm-workspace-deploy.yaml
-          sed -n '/^catalogs:/,$p' pnpm-workspace.yaml >> pnpm-workspace-deploy.yaml
+          # Remove workspace file and packages directory
+          rm -rf pnpm-workspace.yaml packages
 
-          # Create flattened package.json by removing workspace dependencies
-          json -I -f package.json \
-            -e "delete this.dependencies['@onepipe/core']" \
-            -e "delete this.dependencies['@onepipe/destination-bigquery']" \
-            -e "this.scripts = {deploy: 'wrangler deploy', dev: 'wrangler dev'}"
-
-          # Move workspace file into place
-          mv pnpm-workspace-deploy.yaml pnpm-workspace.yaml
-
-          # First install to resolve catalogs
-          pnpm install --no-frozen-lockfile
-
-          # Now update package.json to use resolved versions instead of catalog: references
-          pnpm install --no-frozen-lockfile --update-lockfile-only
-
-          # Remove workspace file (not needed in final deploy)
-          rm pnpm-workspace.yaml
+          # Install with npm to create a standard lockfile
+          npm install
 
           # Add deploy-specific README
           cat > README-DEPLOY.md << 'EOF'
