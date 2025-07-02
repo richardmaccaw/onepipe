@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@types/lodash": "catalog:dev",
-    "@types/uuid": "catalog:dev", 
+    "@types/uuid": "catalog:dev",
     "typescript": "catalog:dev",
     "wrangler": "catalog:dev"
   },

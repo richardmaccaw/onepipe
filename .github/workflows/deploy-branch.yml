@@ -3,7 +3,13 @@ name: Generate Deploy Branch
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   generate-deploy:
@@ -23,33 +29,43 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Install json utility
+        run: npm install -g json
+
       - name: Create deployable version
         run: |
-          # Create a minimal pnpm workspace that includes packages but no workspace protocol
-          cat > pnpm-workspace-deploy.yaml << 'EOF'
-          packages: []
-          EOF
+          # Extract catalog dependencies from pnpm-workspace.yaml
+          # This creates a temporary file with package:version mappings
+          cat pnpm-workspace.yaml | sed -n '/catalogs:/,/^[^ ]/p' | grep '^\s*"' | sed 's/[[:space:]]*"\([^"]*\)":[[:space:]]*"\([^"]*\)".*/\1=\2/' > catalog-deps.txt
 
-          # Append catalog section from original workspace
-          grep -A 100 "^catalog:" pnpm-workspace.yaml >> pnpm-workspace-deploy.yaml
+          # Create a backup of package.json
+          cp package.json package.json.bak
 
-          # Install json utility if needed
-          npm install -g json
+          # Replace catalog references with actual versions
+          while IFS='=' read -r pkg version; do
+            # Replace in package.json using json utility
+            json -I -f package.json -e "
+              if (this.dependencies && this.dependencies['$pkg'] && this.dependencies['$pkg'].includes('catalog')) {
+                this.dependencies['$pkg'] = '$version';
+              }
+              if (this.devDependencies && this.devDependencies['$pkg'] && this.devDependencies['$pkg'].includes('catalog')) {
+                this.devDependencies['$pkg'] = '$version';
+              }
+            "
+          done < catalog-deps.txt
 
-          # Create flattened package.json by removing workspace dependencies
+          # Remove workspace dependencies and update scripts
           json -I -f package.json \
             -e "delete this.dependencies['@onepipe/core']" \
             -e "delete this.dependencies['@onepipe/destination-bigquery']" \
             -e "this.scripts = {deploy: 'wrangler deploy', dev: 'wrangler dev'}"
 
-          # Move workspace file into place
-          mv pnpm-workspace-deploy.yaml pnpm-workspace.yaml
+          # Clean up
+          rm -f catalog-deps.txt package.json.bak
+          rm -rf pnpm-workspace.yaml packages pnpm-lock.yaml
 
-          # Install to resolve all catalogs
-          pnpm install
-
-          # Remove workspace file (not needed in final deploy)
-          rm pnpm-workspace.yaml
+          # Install with npm
+          npm install
 
           # Add deploy-specific README
           cat > README-DEPLOY.md << 'EOF'
@@ -60,23 +76,13 @@ jobs:
           This is an auto-generated branch optimized for Cloudflare deployment.
 
           **Source:** [main branch](https://github.com/richardmaccaw/onepipe)
-
-          ## Deployment
-
-          Click the button above or run:
-
-          ```bash
-          git clone -b deploy https://github.com/richardmaccaw/onepipe.git
-          cd onepipe
-          pnpm install
-          pnpm run deploy
-          ```
           EOF
 
       - name: Push to deploy branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b deploy
           git add .
           git commit -m "Deploy version from main@${GITHUB_SHA::7}"
-          git push --force origin HEAD:deploy
+          git push --force origin deploy
