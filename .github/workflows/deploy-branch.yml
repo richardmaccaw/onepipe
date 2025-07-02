@@ -23,10 +23,8 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Build packages
-        run: |
-          pnpm install
-          pnpm build
+      - name: Install json utility
+        run: npm install -g json
 
       - name: Create deployable version
         run: |
@@ -36,10 +34,7 @@ jobs:
           EOF
 
           # Append catalog section from original workspace
-          grep -A 100 "^catalog:" pnpm-workspace.yaml >> pnpm-workspace-deploy.yaml
-
-          # Install json utility if needed
-          npm install -g json
+          grep -A 100 "^catalogs:" pnpm-workspace.yaml >> pnpm-workspace-deploy.yaml
 
           # Create flattened package.json by removing workspace dependencies
           json -I -f package.json \
@@ -56,26 +51,15 @@ jobs:
           # Remove workspace file (not needed in final deploy)
           rm pnpm-workspace.yaml
 
-          # Create flattened file structure with built packages
-          mkdir -p src/lib/core src/lib/destinations/bigquery
-          cp packages/core/dist/index.* src/lib/core/
-          cp packages/destination-bigquery/dist/index.* src/lib/destinations/bigquery/
-          cp wrangler.toml onepipe.config.json worker-configuration.d.ts .
-
-          # Transform imports to use local files
-          find src -name "*.ts" -exec sed -i.bak "s|@onepipe/core|./lib/core|g" {} \;
-          find src -name "*.ts" -exec sed -i.bak "s|@onepipe/destination-bigquery|./lib/destinations/bigquery|g" {} \;
-          find src -name "*.bak" -delete
-
           # Add deploy-specific README
-          cat > README.md << 'EOF'
-          # OnePipe - Deploy Ready
+          cat > README-DEPLOY.md << 'EOF'
+          # OnePipe - Deploy Branch
 
           [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/richardmaccaw/onepipe/tree/deploy)
 
-          > **Auto-generated from main branch** - [View source](https://github.com/richardmaccaw/onepipe/tree/main)
+          This is an auto-generated branch optimized for Cloudflare deployment.
 
-          Click the deploy button above for instant deployment to Cloudflare Workers.
+          **Source:** [main branch](https://github.com/richardmaccaw/onepipe)
           EOF
 
       - name: Push to deploy branch
