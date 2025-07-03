@@ -1,0 +1,9 @@
+{
+  "destinations": [
+    {
+      "name": "bigquery",
+      "package": "@onepipe/destination-bigquery",
+      "options": {}
+    }
+  ]
+}

@@ -41,7 +41,7 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 **Plugin System (`src/plugin-loader.ts`)**
 
 - Singleton pattern for plugin instances
-- Configuration-driven loading via `onepipe.config.json`
+- Configuration-driven loading via `onepipe-configuration.json`
 - Dynamic imports with standardized `DestinationPlugin` interface
 - Each plugin implements optional methods: `identify()`, `track()`, `page()`
 
@@ -73,7 +73,7 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 
 ### Configuration
 
-**Plugin Configuration (`onepipe.config.json`)**
+**Plugin Configuration (`onepipe-configuration.json`)**
 
 ```json
 {
@@ -84,10 +84,12 @@ OnePipe is an open-core Segment alternative built on Cloudflare Workers with a p
 **Environment Variables**
 
 Non-sensitive variables (set in wrangler.toml [vars] sections):
+
 - `BIGQUERY_PROJECT_ID` - BigQuery project identifier
 - `BIGQUERY_DATASET_ID` - BigQuery dataset identifier
 
 Sensitive secrets (set via wrangler CLI):
+
 - `GOOGLE_CLOUD_CREDENTIALS` - Service account JSON (base64 encoded)
 
 **Environment Setup**
@@ -96,12 +98,12 @@ Sensitive secrets (set via wrangler CLI):
 2. **Production Secrets**: Use wrangler CLI to set sensitive values:
    ```bash
    wrangler secret put GOOGLE_CLOUD_CREDENTIALS
-   wrangler secret put GOOGLE_CLOUD_CREDENTIALS --env staging  
+   wrangler secret put GOOGLE_CLOUD_CREDENTIALS --env staging
    wrangler secret put GOOGLE_CLOUD_CREDENTIALS --env production
    ```
 3. **Dashboard Alternative**: Set secrets via [Cloudflare Dashboard](https://developers.cloudflare.com/workers/configuration/environment-variables/#add-environment-variables-via-the-dashboard) under Workers & Pages > Your Worker > Settings > Variables
 
-**Infrastructure (`wrangler.toml`)**
+**Infrastructure (`wrangler.jsonc`)**
 
 - KV namespace `TOKEN_CACHE` for Google token caching
 - Queue `onepipe-queue` for async event processing
@@ -122,7 +124,7 @@ Sensitive secrets (set via wrangler CLI):
 - Implement `DestinationPlugin` interface
 - Export default object with `name` and `setup()` function
 - `setup()` returns instance with optional event handlers
-- Add to `onepipe.config.json` destinations array
+- Add to `onepipe-configuration.json` destinations array
 
 **Type Safety**
 
