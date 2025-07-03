@@ -1,4 +1,4 @@
-import type { Destination, Env } from '@onepipe/core'
+import type { Destination, DestinationInstance, Env, IdentifySystemEvent, TrackSystemEvent } from '@onepipe/core'
 import { bigquery_handleIdentify } from './events/identify'
 import { bigquery_handleTrack } from './events/track'
 import { bigQueryEnv } from './lib/env'
@@ -9,11 +9,11 @@ import { bigQueryEnv } from './lib/env'
  */
 export const destinationBigQuery: Destination = {
   name: '@onepipe/destination-bigquery',
-  async setup(env: Env) {
+  async setup(env: Env): Promise<DestinationInstance> {
     const pluginEnv = await bigQueryEnv(env)
     return {
-      identify: (event) => bigquery_handleIdentify(event, pluginEnv),
-      track: (event) => bigquery_handleTrack(event, pluginEnv),
+      identify: (event: IdentifySystemEvent) => bigquery_handleIdentify(event, pluginEnv),
+      track: (event: TrackSystemEvent) => bigquery_handleTrack(event, pluginEnv),
     }
   },
 }

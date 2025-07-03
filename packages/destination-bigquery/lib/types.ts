@@ -1,3 +1,5 @@
+import type { Env } from '@onepipe/core'
+
 export const baseUrl = 'https://bigquery.googleapis.com/bigquery/v2' as const
 
 export const destinationName = 'destination-bigquery'
@@ -31,4 +33,10 @@ export interface BigQueryInsertResponse {
       message: string
     }[]
   }[]
+}
+
+export interface BigQueryEnv extends Env {
+  BIGQUERY_PROJECT_ID: string
+  BIGQUERY_DATASET_ID: string
+  GOOGLE_CLOUD_CREDENTIALS: string
 } 

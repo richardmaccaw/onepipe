@@ -90,5 +90,5 @@ export interface DestinationInstance {
 
 export interface Destination {
   name: string
-  setup(env: Env): DestinationInstance
+  setup(env: Env): Promise<DestinationInstance>
 }

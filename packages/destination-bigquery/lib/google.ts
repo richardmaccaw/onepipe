@@ -1,8 +1,6 @@
 import { getAccessToken } from '@maccman/web-auth-library/google'
 import type { BigQueryEnv } from './types'
 
-// Generate a short lived access token from the service account key credentials
-
 async function getAccessTokenForEnv(env: BigQueryEnv): Promise<string> {
   return getAccessToken({
     credentials: env.GOOGLE_CLOUD_CREDENTIALS,
@@ -11,7 +9,8 @@ async function getAccessTokenForEnv(env: BigQueryEnv): Promise<string> {
 }
 
 export async function getCachedAccessTokenForEnv(env: BigQueryEnv): Promise<string> {
-  const cachedToken = await env.tokenCache.get('access_token')
+  const cacheKey = 'bigquery:access_token'
+  const cachedToken = await env.KV_BINDING.get(cacheKey)
 
   if (cachedToken) {
     return cachedToken
@@ -19,7 +18,7 @@ export async function getCachedAccessTokenForEnv(env: BigQueryEnv): Promise<stri
 
   const accessToken = await getAccessTokenForEnv(env)
 
-  await env.tokenCache.put('access_token', accessToken, { expirationTtl: 3600 })
+  await env.KV_BINDING.put(cacheKey, accessToken, { expirationTtl: 3600 })
 
   return accessToken
 } 
