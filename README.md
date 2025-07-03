@@ -2,22 +2,39 @@
 
 Open-source Segment alternative built on Cloudflare Workers with a plugin-based architecture.
 
-## Quick Start
+## 🚀 Quick Start
 
-### Option 1: Deploy to Cloudflare (Recommended)
+### Option 1: Deploy Standalone Worker (Recommended)
 
-Click the deploy button to get started in seconds:
+Use our self-contained Cloudflare Worker template:
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/richardmaccaw/onepipe/tree/deploy)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/richardmaccaw/onepipe/tree/worker-deploy)
 
-> **Note**: The deploy button uses our auto-generated `deploy` branch which contains a flattened version compatible with Cloudflare's deployment system.
+This deploys a standalone worker without the monorepo structure. Add destinations like BigQuery by running:
 
-### Option 2: Manual Setup
+```bash
+npm install @onepipe/destination-bigquery
+```
+
+### Option 2: Deploy Legacy Version
+
+Use the legacy monorepo-based deployment:
+
+[![Deploy Legacy Version](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/richardmaccaw/onepipe/tree/deploy)
+
+### Option 3: Manual Development Setup
 
 1. Clone this repository
 2. Install dependencies: `pnpm install`
 3. Configure environment variables (see below)
 4. Deploy: `pnpm run deploy`
+
+## 📁 Repository Structure
+
+- **`examples/cloudflare-worker/`** - Standalone worker template (recommended for production)
+- **`packages/core/`** - Core types and utilities
+- **`packages/destination-bigquery/`** - BigQuery destination plugin
+- **`src/`** - Legacy worker implementation
 
 ## Configuration
 
