@@ -1,6 +1,6 @@
 import type { Env, TrackSystemEvent, IdentifySystemEvent, PageSystemEvent } from './types'
 import type { Destination, DestinationInstance } from '@onepipe/core'
-import defaultConfig from '../onepipe.config.json'
+import defaultConfig from '../onepipe-configuration.json'
 
 // Destination registry with lazy dynamic imports
 const DESTINATION_REGISTRY: Record<string, () => Promise<Destination>> = {
