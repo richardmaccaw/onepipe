@@ -6,7 +6,7 @@ import { trackEventSchema, identifyEventSchema, pageEventSchema } from '@onepipe
 import type { TrackSystemEvent, IdentifySystemEvent } from '@onepipe/core'
 
 const eventsApp = new Hono<{ Bindings: Env }>()
-  .post('/track', zValidator('json', trackEventSchema), async (c) => {
+  .on('POST', ['/track', '/t'], zValidator('json', trackEventSchema), async (c) => {
     const data = c.req.valid('json')
     const env = c.env as Env
     
@@ -28,7 +28,7 @@ const eventsApp = new Hono<{ Bindings: Env }>()
 
     return c.json({ ok: true })
   })
-  .post('/identify', zValidator('json', identifyEventSchema), async (c) => {
+  .on('POST', ['/identify', '/i'], zValidator('json', identifyEventSchema), async (c) => {
     const data = c.req.valid('json')
     const env = c.env as Env
     
@@ -50,7 +50,7 @@ const eventsApp = new Hono<{ Bindings: Env }>()
 
     return c.json({ ok: true })
   })
-  .post('/page', zValidator('json', pageEventSchema), async (c) => {
+  .on('POST', ['/page', '/p'], zValidator('json', pageEventSchema), async (c) => {
     const data = c.req.valid('json')
     const env = c.env as Env
     
