@@ -2,41 +2,15 @@
   // OnePipe Cloudflare Worker Configuration
   "name": "onepipe",
   "main": "src/worker.ts",
-  "compatibility_date": "2025-06-20",
-
+  "$schema": "https://unpkg.com/wrangler@latest/config-schema.json",
+  "compatibility_date": "2025-02-04",
   // KV Namespace binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/kv
   "kv_namespaces": [
     {
-      "binding": "TOKEN_CACHE"
+      "binding": "KV_BINDING",
+      "id": "b02cca4ca8c9402aaf33f6b7eb20eb79"
     }
   ],
-
-  // Durable Object binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/durable-objects
-  // "durable_objects": [
-  //   {
-  //     "binding": "MY_DURABLE_OBJECT",
-  //     "class_name": "MyDurableObject"
-  //   }
-  // ],
-
-  // Bucket binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/kv#bucket
-  // "buckets": [
-  //   {
-  //     "binding": "MY_BUCKET",
-  //     "name": "my-bucket",
-  //     "bucket_id": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
-  //   }
-  // ],
-
-  // Service binding - For more information: https://developers.cloudflare.com/workers/platform/services
-  // "routes": [
-  //   {
-  //     "binding": "MY_SERVICE",
-  //     "pattern": "/api/*",
-  //     "script": "api.js"
-  //   }
-  // ],
-
   // Queue binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/queues
   "queues": {
     "producer": {
@@ -49,10 +23,7 @@
       "max_batch_timeout": 5
     }
   },
-
   "observability": {
-    "logs": {
-      "enabled": true
-    }
-  }
+    "enabled": true
+  },
 }
