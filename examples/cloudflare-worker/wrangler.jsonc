@@ -1,0 +1,36 @@
+{
+  // OnePipe Cloudflare Worker Configuration
+  "name": "onepipe",
+  "main": "src/worker.ts",
+  "compatibility_date": "2025-06-20",
+
+  // KV Namespace binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/kv
+  "kv_namespaces": [
+    {
+      "binding": "TOKEN_CACHE",
+      "id": "",
+      "preview_id": ""
+    }
+  ],
+
+  // Queue binding - For more information: https://developers.cloudflare.com/workers/runtime-apis/queues
+  "queues": {
+    "producers": [
+      {
+        "binding": "QUEUE",
+        "queue": "onepipe-queue"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "onepipe-queue",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5
+      }
+    ]
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}
