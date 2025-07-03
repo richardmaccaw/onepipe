@@ -19,37 +19,6 @@ Click the deploy button to get started in seconds:
 3. Configure environment variables (see below)
 4. Deploy: `pnpm run deploy`
 
-## Configuration
-
-### Environment Variables
-
-Set these in your Cloudflare Worker dashboard or via `wrangler secret put`:
-
-**Required:**
-
-- `GOOGLE_CLOUD_CREDENTIALS` - Base64 encoded service account JSON
-- `BIGQUERY_PROJECT_ID` - Your BigQuery project ID
-- `BIGQUERY_DATASET_ID` - Your BigQuery dataset ID
-
-**Optional:**
-
-- `SETUP_MODE` - Set to `"true"` to enable setup UI
-- `SETUP_TOKEN` - Bearer token for setup authentication
-
-### Setup UI
-
-After deployment, if `SETUP_MODE=true`, visit `https://your-worker.workers.dev/setup` to:
-
-1. Complete OAuth flow with Google
-2. Auto-discover BigQuery projects and datasets
-3. Test your configuration
-
-Access requires Bearer token authentication:
-
-```bash
-curl -H "Authorization: Bearer YOUR_SETUP_TOKEN" https://your-worker.workers.dev/setup
-```
-
 ## API Endpoints
 
 OnePipe provides full Segment HTTP API compatibility:
@@ -71,7 +40,7 @@ OnePipe provides full Segment HTTP API compatibility:
 
 **Plugin System:**
 
-- Configuration-driven loading via `onepipe.config.json`
+- Configuration-driven loading via `onepipe-configuration.json`
 - Standardized `DestinationPlugin` interface
 - Support for multiple destinations simultaneously
 
@@ -83,17 +52,6 @@ OnePipe provides full Segment HTTP API compatibility:
 - `pnpm build` - Build all packages
 - `pnpm check:types` - Run TypeScript type checking
 - `pnpm run deploy` - Deploy to Cloudflare Workers
-
-### Infrastructure Setup
-
-Create required Cloudflare resources:
-
-```bash
-wrangler kv:namespace create "GOOGLE_TOKENS"
-wrangler queues create onepipe-queue
-```
-
-Update `wrangler.toml` with the generated IDs.
 
 ## Recording events
 
