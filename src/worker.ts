@@ -8,15 +8,12 @@ import eventsApp from './routes/events'
 
 const app = new Hono()
 
-// Apply CORS middleware globally
 app.use('*', cors({
   origin: '*',
   allowMethods: ['POST', 'GET', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
 }))
 
-
-// Mount route modules
 app.route('/', indexApp)
 app.route('/', eventsApp)
 
