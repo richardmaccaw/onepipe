@@ -20,7 +20,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `pnpm run deploy` - Deploy the Cloudflare Worker to production
 - `wrangler queues create onepipe-queue` - Create the required Cloudflare Queue
-- `wrangler kv:namespace create "GOOGLE_TOKENS"` - Create KV namespace for token caching
 
 ### Package Development
 
@@ -105,7 +104,7 @@ Sensitive secrets (set via wrangler CLI):
 
 **Infrastructure (`wrangler.jsonc`)**
 
-- KV namespace `TOKEN_CACHE` for Google token caching
+- KV namespace `KV_BINDING` for Google token caching
 - Queue `onepipe-queue` for async event processing
 - Observability logging enabled
 

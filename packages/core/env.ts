@@ -1,8 +1,6 @@
 import { QueueMessage } from './types'
 
 export interface Env {
-  TOKEN_CACHE: KVNamespace
+  KV_BINDING: KVNamespace
   QUEUE: Queue<QueueMessage>
-
-  [key: string]: any
 }

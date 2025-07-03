@@ -1,29 +1,29 @@
-import type { Cache, Env } from '@onepipe/core'
-import { createNamespacedCache } from '@onepipe/core'
-import type { BigQueryEnv } from './types'
+import type { Env } from '@onepipe/core'
+import { destinationName } from './types'
 
-export type { BigQueryEnv }
+/**
+ * Loads and validates BigQuery environment variables from KV and secrets.
+ * Throws if any required variable is missing.
+ */
+export async function bigQueryEnv(env: Env) {
+  const result = await env.KV_BINDING.getWithMetadata(destinationName)
+  const { BIGQUERY_PROJECT_ID, BIGQUERY_DATASET_ID } = result.metadata
+  const { GOOGLE_CLOUD_CREDENTIALS } = env
 
-
-export function createBigQueryEnv(
-  env: Env & BigQueryEnv
-): BigQueryEnv {
-  if (!env.BIGQUERY_PROJECT_ID) {
-    throw new Error('Missing BIGQUERY_PROJECT_ID environment variable. Please set in .env file or wrangler.toml.');
+  if (!BIGQUERY_PROJECT_ID) {
+    throw new Error('Missing BIGQUERY_PROJECT_ID environment variable.')
   }
-  
-  if (!env.BIGQUERY_DATASET_ID) {
-    throw new Error('Missing BIGQUERY_DATASET_ID environment variable. Please set in .env file or wrangler.toml.');
+  if (!BIGQUERY_DATASET_ID) {
+    throw new Error('Missing BIGQUERY_DATASET_ID environment variable.')
   }
-  
-  if (!env.GOOGLE_CLOUD_CREDENTIALS) {
-    throw new Error('Missing GOOGLE_CLOUD_CREDENTIALS. Please set using: wrangler secret put GOOGLE_CLOUD_CREDENTIALS');
+  if (!GOOGLE_CLOUD_CREDENTIALS) {
+    throw new Error('Missing GOOGLE_CLOUD_CREDENTIALS. Please set using: wrangler secret put GOOGLE_CLOUD_CREDENTIALS')
   }
 
   return {
-    tokenCache: createNamespacedCache(env.TOKEN_CACHE, 'google'),
-    BIGQUERY_PROJECT_ID: env.BIGQUERY_PROJECT_ID,
-    BIGQUERY_DATASET_ID: env.BIGQUERY_DATASET_ID,
-    GOOGLE_CLOUD_CREDENTIALS: env.GOOGLE_CLOUD_CREDENTIALS,
+    env,
+    BIGQUERY_PROJECT_ID,
+    BIGQUERY_DATASET_ID,
+    GOOGLE_CLOUD_CREDENTIALS,
   }
 }
