@@ -20,8 +20,8 @@ Options:
 
 What it does:
 • Prompts for BigQuery project ID and dataset ID
-• Uploads Google Cloud service account credentials to Cloudflare
-• Sets required environment variables (GOOGLE_CLOUD_CREDENTIALS, BIGQUERY_PROJECT_ID, BIGQUERY_DATASET_ID)
+• Uploads Google Cloud service account credentials to Cloudflare Secrets
+• Stores project/dataset IDs in Cloudflare KV (non-sensitive config)
 • Updates onepipe-configuration.json automatically
 
 Requirements:
@@ -110,26 +110,40 @@ async function main() {
 
     console.log('\n⚙️  Setting up BigQuery configuration...\n');
 
-    // Step 4: Set Cloudflare secrets
-    console.log('📤 Setting Cloudflare Worker secrets...');
+    // Step 4: Set Cloudflare secrets and KV values
+    console.log('📤 Setting Cloudflare Worker configuration...');
     
     // Read and encode credentials
     const credentials = readFileSync(credentialsPath, 'utf8');
     const encodedCredentials = Buffer.from(credentials).toString('base64');
 
-    // Set secrets using wrangler
+    // Set sensitive credential as secret
     try {
-      console.log('  → Setting GOOGLE_CLOUD_CREDENTIALS...');
+      console.log('  → Setting GOOGLE_CLOUD_CREDENTIALS (secret)...');
       execSync(`echo "${encodedCredentials}" | wrangler secret put GOOGLE_CLOUD_CREDENTIALS`, { stdio: 'pipe' });
-      
-      console.log('  → Setting BIGQUERY_PROJECT_ID...');
-      execSync(`echo "${projectId}" | wrangler secret put BIGQUERY_PROJECT_ID`, { stdio: 'pipe' });
-      
-      console.log('  → Setting BIGQUERY_DATASET_ID...');
-      execSync(`echo "${datasetId}" | wrangler secret put BIGQUERY_DATASET_ID`, { stdio: 'pipe' });
       
     } catch (error) {
       console.error('❌ Error setting secrets. Make sure you have wrangler installed and are authenticated.');
+      console.error('Run: wrangler auth login');
+      process.exit(1);
+    }
+
+    // Set non-sensitive configuration in KV as metadata
+    try {
+      console.log('  → Setting BigQuery configuration (KV metadata)...');
+      const kvData = JSON.stringify({ 
+        configured: true, 
+        timestamp: new Date().toISOString() 
+      });
+      const metadata = JSON.stringify({
+        BIGQUERY_PROJECT_ID: projectId,
+        BIGQUERY_DATASET_ID: datasetId
+      });
+      
+      execSync(`wrangler kv key put --binding=${KV_BINDING} "destination-bigquery" '${kvData}' --metadata='${metadata}'`, { stdio: 'pipe' });
+      
+    } catch (error) {
+      console.error('❌ Error setting KV values. Make sure you have wrangler installed and are authenticated.');
       console.error('Run: wrangler auth login');
       process.exit(1);
     }
@@ -168,10 +182,15 @@ async function main() {
 ==========================
 
 Configuration Summary:
-• Project ID: ${projectId}
-• Dataset ID: ${datasetId}
+• Project ID: ${projectId} (stored in KV)
+• Dataset ID: ${datasetId} (stored in KV)
+• Service Account: ✅ Credentials stored in Cloudflare Secrets
 • KV Binding: ${KV_BINDING}
-• Service Account: ✅ Uploaded to Cloudflare
+
+Storage Details:
+• GOOGLE_CLOUD_CREDENTIALS → Cloudflare Worker Secret (sensitive)
+• BIGQUERY_PROJECT_ID → KV: ${KV_BINDING}/destination-bigquery metadata (non-sensitive)
+• BIGQUERY_DATASET_ID → KV: ${KV_BINDING}/destination-bigquery metadata (non-sensitive)
 
 Next Steps:
 1. Make sure your BigQuery dataset exists in Google Cloud Console
@@ -183,6 +202,8 @@ Useful Commands:
 • Deploy worker: pnpm run deploy
 • View logs: wrangler tail
 • List secrets: wrangler secret list
+• List KV keys: wrangler kv key list --binding=${KV_BINDING}
+• View BigQuery config: wrangler kv key get --binding=${KV_BINDING} "destination-bigquery" --metadata
 
 Happy data pipelining! 🚀
 `);

@@ -55,8 +55,8 @@ pnpm run setup:bigquery
 This interactive CLI tool will:
 
 - Guide you through entering your BigQuery project ID and dataset ID
-- Upload your Google Cloud service account credentials to Cloudflare
-- Configure all required environment variables
+- Upload your Google Cloud service account credentials to Cloudflare Secrets
+- Store project/dataset IDs in Cloudflare KV metadata (non-sensitive configuration)
 - Update your `onepipe-configuration.json` automatically
 
 **Requirements:**
