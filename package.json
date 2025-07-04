@@ -1,31 +1,32 @@
 {
-  "name": "setup-bigquery-cloudflare",
-  "version": "1.0.0",
-  "description": "CLI tool to configure BigQuery destination settings in Cloudflare",
-  "main": "index.js",
-  "bin": {
-    "setup-bigquery-cloudflare": "./cli.js"
-  },
+  "name": "onepipe",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "start": "node cli.js"
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "check:types": "tsc --noEmit",
+    "cf-typegen": "wrangler types",
+    "build": "pnpm -r run build",
+    "build:core": "pnpm --filter @onepipe/core run build",
+    "build:destination-bigquery": "pnpm --filter @onepipe/destination-bigquery run build"
   },
-  "keywords": [
-    "bigquery",
-    "cloudflare",
-    "cli",
-    "setup"
-  ],
-  "author": "",
-  "license": "MIT",
+  "devDependencies": {
+    "@types/lodash": "catalog:dev",
+    "@types/uuid": "catalog:dev",
+    "typescript": "catalog:dev",
+    "wrangler": "catalog:dev"
+  },
   "dependencies": {
-    "chalk": "^5.3.0",
-    "commander": "^11.1.0",
-    "dotenv": "^16.3.1",
-    "inquirer": "^9.2.12",
-    "ora": "^7.0.1"
-  },
-  "engines": {
-    "node": ">=14.0.0"
-  },
-  "type": "module"
+    "@hono/zod-validator": "catalog:",
+    "@maccman/web-auth-library": "catalog:",
+    "@onepipe/core": "workspace:*",
+    "@onepipe/destination-bigquery": "workspace:*",
+    "hono": "catalog:",
+    "lodash": "catalog:",
+    "uuid": "catalog:",
+    "web-auth-library": "catalog:",
+    "zod": "catalog:"
+  }
 }

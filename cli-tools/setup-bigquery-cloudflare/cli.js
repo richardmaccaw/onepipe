@@ -102,12 +102,6 @@ async function promptForConfig() {
       validate: input => input.length > 0 || 'Dataset ID is required'
     },
     {
-      type: 'input',
-      name: 'tableId',
-      message: 'BigQuery Table ID:',
-      validate: input => input.length > 0 || 'Table ID is required'
-    },
-    {
       type: 'editor',
       name: 'serviceAccountKey',
       message: 'Paste your BigQuery Service Account Key JSON (opens editor):',
@@ -119,12 +113,6 @@ async function promptForConfig() {
           return 'Invalid JSON format';
         }
       }
-    },
-    {
-      type: 'confirm',
-      name: 'createSecrets',
-      message: 'Store sensitive data as Cloudflare secrets?',
-      default: true
     }
   ]);
 

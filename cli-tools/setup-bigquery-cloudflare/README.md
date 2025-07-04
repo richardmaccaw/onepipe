@@ -6,7 +6,7 @@ A minimal CLI tool to help developers configure BigQuery destination settings in
 
 - Interactive setup wizard
 - Configures Cloudflare environment variables
-- Supports storing sensitive data as Cloudflare secrets
+- Securely stores service account key as Cloudflare secret
 - Validates BigQuery service account credentials
 - Generates wrangler.toml configuration
 
@@ -47,21 +47,22 @@ You'll need the following information ready:
 **BigQuery:**
 - Project ID
 - Dataset ID
-- Table ID
 - Service Account Key (JSON)
 
 ## Configuration
 
-The tool will set up the following environment variables in your Cloudflare Worker:
+The tool will set up the following in your Cloudflare Worker:
 
+**Environment Variables:**
 - `BIGQUERY_PROJECT_ID`
 - `BIGQUERY_DATASET_ID`
-- `BIGQUERY_TABLE_ID`
-- `BIGQUERY_SERVICE_ACCOUNT_KEY` (as env var or secret)
+
+**Secrets:**
+- `BIGQUERY_SERVICE_ACCOUNT_KEY` (always stored as a secret for security)
 
 ## Security
 
-By default, the tool offers to store the BigQuery service account key as a Cloudflare secret for better security. This is recommended for production use.
+The BigQuery service account key is always stored as a Cloudflare secret to ensure proper security. This protects your credentials from being exposed in environment variables.
 
 ## Next Steps
 

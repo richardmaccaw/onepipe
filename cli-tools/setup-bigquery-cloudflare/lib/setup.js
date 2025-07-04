@@ -11,19 +11,13 @@ export async function setupBigQuery(config) {
   // Environment variables to set
   const envVars = {
     'BIGQUERY_PROJECT_ID': config.projectId,
-    'BIGQUERY_DATASET_ID': config.datasetId,
-    'BIGQUERY_TABLE_ID': config.tableId
+    'BIGQUERY_DATASET_ID': config.datasetId
   };
 
-  // Secrets to create
-  const secrets = config.createSecrets ? {
+  // Service account key always stored as secret
+  const secrets = {
     'BIGQUERY_SERVICE_ACCOUNT_KEY': config.serviceAccountKey
-  } : {};
-
-  // Also add service account key as env var if not using secrets
-  if (!config.createSecrets) {
-    envVars['BIGQUERY_SERVICE_ACCOUNT_KEY'] = config.serviceAccountKey;
-  }
+  };
 
   try {
     // First, check if the worker exists
@@ -75,28 +69,26 @@ export async function setupBigQuery(config) {
       throw new Error(`Failed to set environment variables: ${error.errors?.[0]?.message || 'Unknown error'}`);
     }
 
-    // Create secrets if requested
-    if (config.createSecrets && Object.keys(secrets).length > 0) {
-      console.log(chalk.gray('\n🔐 Creating secrets...'));
+    // Create secrets
+    console.log(chalk.gray('\n🔐 Creating secrets...'));
+    
+    for (const [secretName, secretValue] of Object.entries(secrets)) {
+      console.log(chalk.gray(`   - ${secretName}`));
       
-      for (const [secretName, secretValue] of Object.entries(secrets)) {
-        console.log(chalk.gray(`   - ${secretName}`));
-        
-        const secretUrl = `${CLOUDFLARE_API_BASE}/accounts/${config.accountId}/workers/scripts/${config.workerName}/secrets`;
-        const secretResponse = await fetch(secretUrl, {
-          method: 'PUT',
-          headers,
-          body: JSON.stringify({
-            name: secretName,
-            text: secretValue,
-            type: 'secret_text'
-          })
-        });
+      const secretUrl = `${CLOUDFLARE_API_BASE}/accounts/${config.accountId}/workers/scripts/${config.workerName}/secrets`;
+      const secretResponse = await fetch(secretUrl, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          name: secretName,
+          text: secretValue,
+          type: 'secret_text'
+        })
+      });
 
-        if (!secretResponse.ok) {
-          const error = await secretResponse.json();
-          throw new Error(`Failed to create secret ${secretName}: ${error.errors?.[0]?.message || 'Unknown error'}`);
-        }
+      if (!secretResponse.ok) {
+        const error = await secretResponse.json();
+        throw new Error(`Failed to create secret ${secretName}: ${error.errors?.[0]?.message || 'Unknown error'}`);
       }
     }
 
@@ -122,10 +114,12 @@ account_id = "${config.accountId}"
 [vars]
 ${Object.entries(envVars).map(([key, value]) => `${key} = "${value}"`).join('\n')}
 
-${Object.keys(secrets).length > 0 ? `# Run this command to set secrets:\n# ${Object.keys(secrets).map(key => `echo '${key}' | wrangler secret put ${key}`).join(' && ')}` : ''}
+# Run this command to set the service account key secret:
+# wrangler secret put BIGQUERY_SERVICE_ACCOUNT_KEY < service-account-key.json
 `;
 
   console.log(wranglerConfig);
   console.log(chalk.gray('─'.repeat(60)));
   console.log(chalk.yellow('\n💡 Save this configuration to wrangler.toml in your worker directory'));
+  console.log(chalk.yellow('💡 Save your service account key to service-account-key.json and run the secret command'));
 }

@@ -23,10 +23,6 @@ export function validateConfig(config) {
     errors.push('BigQuery Dataset ID is required');
   }
 
-  if (!config.tableId || config.tableId.trim() === '') {
-    errors.push('BigQuery Table ID is required');
-  }
-
   // Service Account Key validation
   if (!config.serviceAccountKey) {
     errors.push('BigQuery Service Account Key is required');
