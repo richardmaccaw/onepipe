@@ -1,0 +1,17 @@
+node_modules/
+.env
+.env.local
+*.log
+.DS_Store
+dist/
+build/
+
+# Config files that might contain sensitive data
+config.json
+config.yaml
+*.key
+*.pem
+
+# Test files
+test-config.json
+*.test.json
