@@ -1,125 +1,93 @@
 import chalk from 'chalk';
-
-const CLOUDFLARE_API_BASE = 'https://api.cloudflare.com/client/v4';
+import { writeFileSync, unlinkSync } from 'fs';
+import { runCommand } from './utils.js';
+import path from 'path';
 
 export async function setupBigQuery(config) {
-  const headers = {
-    'Authorization': `Bearer ${config.apiToken}`,
-    'Content-Type': 'application/json'
-  };
-
   // Environment variables to set
   const envVars = {
     'BIGQUERY_PROJECT_ID': config.projectId,
     'BIGQUERY_DATASET_ID': config.datasetId
   };
 
-  // Service account key always stored as secret
-  const secrets = {
-    'BIGQUERY_SERVICE_ACCOUNT_KEY': config.serviceAccountKey
-  };
-
   try {
-    // First, check if the worker exists
-    const workerUrl = `${CLOUDFLARE_API_BASE}/accounts/${config.accountId}/workers/scripts/${config.workerName}`;
-    const checkResponse = await fetch(workerUrl, {
-      method: 'GET',
-      headers
-    });
-
-    if (!checkResponse.ok && checkResponse.status !== 404) {
-      const error = await checkResponse.json();
-      throw new Error(`Failed to check worker: ${error.errors?.[0]?.message || 'Unknown error'}`);
+    // Check if wrangler.jsonc exists
+    console.log(chalk.gray('\n🔍 Checking for wrangler configuration...'));
+    const configCheck = runCommand('ls wrangler.jsonc', { silent: true });
+    
+    if (!configCheck.success) {
+      console.log(chalk.yellow('\n⚠️  No wrangler.jsonc found in current directory'));
+      console.log(chalk.yellow('Please run this command from your worker directory'));
+      throw new Error('wrangler.jsonc not found');
     }
 
-    const workerExists = checkResponse.ok;
+    console.log(chalk.green('✓ Found wrangler.jsonc'));
 
     // Set environment variables
     console.log(chalk.gray('\n📝 Setting environment variables...'));
     
     for (const [key, value] of Object.entries(envVars)) {
-      console.log(chalk.gray(`   - ${key}`));
-    }
-
-    const envVarsPayload = {
-      vars: envVars
-    };
-
-    const envVarsUrl = `${CLOUDFLARE_API_BASE}/accounts/${config.accountId}/workers/scripts/${config.workerName}/settings`;
-    
-    // If worker doesn't exist, we'll just prepare the config
-    if (!workerExists) {
-      console.log(chalk.yellow('\n⚠️  Worker does not exist yet.'));
-      console.log(chalk.yellow('Configuration will be applied when you deploy the worker.'));
+      console.log(chalk.gray(`   Setting ${key}...`));
+      const command = `wrangler secret put ${key}`;
       
-      // Generate wrangler.toml content
-      generateWranglerConfig(config, envVars, secrets);
-      return;
+      // For non-secret env vars, we'll use a different approach
+      // First, let's check if we can use wrangler.toml approach
+      console.log(chalk.yellow(`   Note: ${key} should be added to your wrangler.jsonc vars section`));
     }
 
-    // Update environment variables
-    const envResponse = await fetch(envVarsUrl, {
-      method: 'PATCH',
-      headers,
-      body: JSON.stringify(envVarsPayload)
-    });
-
-    if (!envResponse.ok) {
-      const error = await envResponse.json();
-      throw new Error(`Failed to set environment variables: ${error.errors?.[0]?.message || 'Unknown error'}`);
-    }
-
-    // Create secrets
-    console.log(chalk.gray('\n🔐 Creating secrets...'));
+    // Store service account key as secret
+    console.log(chalk.gray('\n🔐 Setting service account key as secret...'));
     
-    for (const [secretName, secretValue] of Object.entries(secrets)) {
-      console.log(chalk.gray(`   - ${secretName}`));
+    // Create a temporary file for the service account key
+    const tempFile = path.join(process.cwd(), '.temp-service-account-key.json');
+    
+    try {
+      // Write service account key to temp file
+      writeFileSync(tempFile, config.serviceAccountKey, 'utf8');
       
-      const secretUrl = `${CLOUDFLARE_API_BASE}/accounts/${config.accountId}/workers/scripts/${config.workerName}/secrets`;
-      const secretResponse = await fetch(secretUrl, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify({
-          name: secretName,
-          text: secretValue,
-          type: 'secret_text'
-        })
-      });
-
-      if (!secretResponse.ok) {
-        const error = await secretResponse.json();
-        throw new Error(`Failed to create secret ${secretName}: ${error.errors?.[0]?.message || 'Unknown error'}`);
+      // Use wrangler to set the secret
+      const secretCommand = `wrangler secret put BIGQUERY_SERVICE_ACCOUNT_KEY < ${tempFile}`;
+      console.log(chalk.gray('   Running: wrangler secret put BIGQUERY_SERVICE_ACCOUNT_KEY'));
+      
+      const result = runCommand(secretCommand);
+      
+      if (!result.success) {
+        throw new Error(`Failed to set secret: ${result.error}`);
+      }
+      
+      console.log(chalk.green('✓ Service account key stored as secret'));
+      
+    } finally {
+      // Clean up temp file
+      try {
+        unlinkSync(tempFile);
+      } catch (e) {
+        // Ignore cleanup errors
       }
     }
 
-    console.log(chalk.green('\n✅ Configuration successfully applied!'));
+    // Show instructions for manual configuration
+    console.log(chalk.blue('\n📋 Manual Configuration Required:'));
+    console.log(chalk.gray('─'.repeat(60)));
+    console.log(chalk.yellow('\nAdd these environment variables to your wrangler.jsonc:'));
+    console.log(chalk.cyan('\n{'));
+    console.log(chalk.cyan('  "vars": {'));
+    for (const [key, value] of Object.entries(envVars)) {
+      console.log(chalk.cyan(`    "${key}": "${value}",`));
+    }
+    console.log(chalk.cyan('    // ... other vars'));
+    console.log(chalk.cyan('  }'));
+    console.log(chalk.cyan('}'));
+    console.log(chalk.gray('─'.repeat(60)));
+
+    console.log(chalk.green('\n✅ Secret configuration complete!'));
+    console.log(chalk.gray('\nThe service account key has been stored as a Cloudflare secret.'));
+    console.log(chalk.gray('Don\'t forget to update your wrangler.jsonc with the environment variables above.'));
 
   } catch (error) {
-    if (error.message.includes('Invalid Access Token')) {
-      throw new Error('Invalid Cloudflare API Token. Please check your credentials.');
+    if (error.message.includes('wrangler.jsonc not found')) {
+      throw error;
     }
-    throw error;
+    throw new Error(`Wrangler command failed: ${error.message}`);
   }
-}
-
-function generateWranglerConfig(config, envVars, secrets) {
-  console.log(chalk.blue('\n📄 Generated wrangler.toml configuration:'));
-  console.log(chalk.gray('─'.repeat(60)));
-  
-  const wranglerConfig = `name = "${config.workerName}"
-main = "src/index.js"
-compatibility_date = "2024-01-01"
-account_id = "${config.accountId}"
-
-[vars]
-${Object.entries(envVars).map(([key, value]) => `${key} = "${value}"`).join('\n')}
-
-# Run this command to set the service account key secret:
-# wrangler secret put BIGQUERY_SERVICE_ACCOUNT_KEY < service-account-key.json
-`;
-
-  console.log(wranglerConfig);
-  console.log(chalk.gray('─'.repeat(60)));
-  console.log(chalk.yellow('\n💡 Save this configuration to wrangler.toml in your worker directory'));
-  console.log(chalk.yellow('💡 Save your service account key to service-account-key.json and run the secret command'));
 }

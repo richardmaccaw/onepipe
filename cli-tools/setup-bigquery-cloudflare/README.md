@@ -1,20 +1,28 @@
-# BigQuery Cloudflare Setup Tool
+# BigQuery Wrangler Setup Tool
 
-A minimal CLI tool to help developers configure BigQuery destination settings in Cloudflare Workers.
+A minimal CLI tool to help developers configure BigQuery destination settings using Cloudflare Wrangler CLI.
 
 ## Features
 
 - Interactive setup wizard
-- Configures Cloudflare environment variables
+- Uses Wrangler CLI for authentication
 - Securely stores service account key as Cloudflare secret
 - Validates BigQuery service account credentials
-- Generates wrangler.toml configuration
+- Provides wrangler.jsonc configuration snippets
+
+## Prerequisites
+
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/) installed
+- Authenticated with Cloudflare via `wrangler login`
+- A Cloudflare Worker with `wrangler.jsonc` configuration file
+- BigQuery service account with appropriate permissions
 
 ## Usage
 
 ### Run with npx (no installation required)
 
 ```bash
+# From your worker directory (where wrangler.jsonc exists)
 npx setup-bigquery-cloudflare
 ```
 
@@ -22,6 +30,7 @@ npx setup-bigquery-cloudflare
 
 ```bash
 npm install -g setup-bigquery-cloudflare
+# Then from your worker directory:
 setup-bigquery-cloudflare
 ```
 
@@ -31,18 +40,14 @@ setup-bigquery-cloudflare
 # Install dependencies
 npm install
 
-# Run the CLI
-npm start
+# Run from your worker directory
+cd /path/to/your/worker
+node /path/to/cli-tools/setup-bigquery-cloudflare/cli.js
 ```
 
 ## Required Information
 
 You'll need the following information ready:
-
-**Cloudflare:**
-- Account ID
-- API Token (with Workers permissions)
-- Worker Name
 
 **BigQuery:**
 - Project ID
@@ -51,26 +56,40 @@ You'll need the following information ready:
 
 ## Configuration
 
-The tool will set up the following in your Cloudflare Worker:
+The tool will:
 
-**Environment Variables:**
-- `BIGQUERY_PROJECT_ID`
-- `BIGQUERY_DATASET_ID`
+1. **Set up a Cloudflare Secret:**
+   - `BIGQUERY_SERVICE_ACCOUNT_KEY` (automatically via wrangler)
 
-**Secrets:**
-- `BIGQUERY_SERVICE_ACCOUNT_KEY` (always stored as a secret for security)
+2. **Provide configuration for wrangler.jsonc:**
+   - `BIGQUERY_PROJECT_ID` (environment variable)
+   - `BIGQUERY_DATASET_ID` (environment variable)
+
+### Example wrangler.jsonc configuration
+
+After running the tool, add the environment variables to your `wrangler.jsonc`:
+
+```json
+{
+  "name": "your-worker-name",
+  "main": "src/index.js",
+  "compatibility_date": "2024-01-01",
+  "vars": {
+    "BIGQUERY_PROJECT_ID": "your-project-id",
+    "BIGQUERY_DATASET_ID": "your-dataset-id"
+  }
+}
+```
 
 ## Security
 
-The BigQuery service account key is always stored as a Cloudflare secret to ensure proper security. This protects your credentials from being exposed in environment variables.
+The BigQuery service account key is always stored as a Cloudflare secret using `wrangler secret put` to ensure proper security. Environment variables for project ID and dataset ID are non-sensitive and can be stored in the `vars` section of your wrangler.jsonc.
 
-## Next Steps
+## Troubleshooting
 
-After running the setup tool:
-
-1. Deploy your Cloudflare Worker using `wrangler deploy`
-2. Test the BigQuery connection
-3. Start sending data to BigQuery
+- **"Wrangler CLI is not installed"**: Install wrangler with `npm install -g wrangler`
+- **"wrangler.jsonc not found"**: Run the tool from your worker directory
+- **Authentication errors**: Run `wrangler login` first
 
 ## License
 

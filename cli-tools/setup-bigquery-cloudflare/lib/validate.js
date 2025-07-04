@@ -1,19 +1,6 @@
 export function validateConfig(config) {
   const errors = [];
 
-  // Cloudflare validation
-  if (!config.accountId || config.accountId.trim() === '') {
-    errors.push('Cloudflare Account ID is required');
-  }
-
-  if (!config.apiToken || config.apiToken.trim() === '') {
-    errors.push('Cloudflare API Token is required');
-  }
-
-  if (!config.workerName || config.workerName.trim() === '') {
-    errors.push('Worker Name is required');
-  }
-
   // BigQuery validation
   if (!config.projectId || config.projectId.trim() === '') {
     errors.push('BigQuery Project ID is required');
@@ -37,6 +24,9 @@ export function validateConfig(config) {
       }
       if (!key.client_email) {
         errors.push('Invalid service account key: missing client_email');
+      }
+      if (!key.project_id) {
+        errors.push('Invalid service account key: missing project_id');
       }
     } catch (e) {
       errors.push('Invalid service account key: must be valid JSON');

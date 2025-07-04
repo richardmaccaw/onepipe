@@ -15,3 +15,6 @@ config.yaml
 # Test files
 test-config.json
 *.test.json
+
+# Temporary files created by the tool
+.temp-service-account-key.json

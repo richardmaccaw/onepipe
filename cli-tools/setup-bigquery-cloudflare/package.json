@@ -1,7 +1,7 @@
 {
   "name": "setup-bigquery-cloudflare",
   "version": "1.0.0",
-  "description": "CLI tool to configure BigQuery destination settings in Cloudflare",
+  "description": "CLI tool to configure BigQuery destination settings using Cloudflare Wrangler",
   "main": "index.js",
   "bin": {
     "setup-bigquery-cloudflare": "./cli.js"
@@ -12,6 +12,7 @@
   "keywords": [
     "bigquery",
     "cloudflare",
+    "wrangler",
     "cli",
     "setup"
   ],
@@ -20,7 +21,6 @@
   "dependencies": {
     "chalk": "^5.3.0",
     "commander": "^11.1.0",
-    "dotenv": "^16.3.1",
     "inquirer": "^9.2.12",
     "ora": "^7.0.1"
   },
