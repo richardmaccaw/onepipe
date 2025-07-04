@@ -10,7 +10,8 @@
     "cf-typegen": "wrangler types",
     "build": "pnpm -r run build",
     "build:core": "pnpm --filter @onepipe/core run build",
-    "build:destination-bigquery": "pnpm --filter @onepipe/destination-bigquery run build"
+    "build:destination-bigquery": "pnpm --filter @onepipe/destination-bigquery run build",
+    "setup:bigquery": "node setup-bigquery.js"
   },
   "devDependencies": {
     "@types/lodash": "catalog:dev",
