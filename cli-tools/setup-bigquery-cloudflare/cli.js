@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { setupBigQuery } from './lib/setup.js';
 import { validateConfig } from './lib/validate.js';
-import { checkWranglerInstalled } from './lib/utils.js';
+import { checkWranglerInstalled, getWranglerConfig } from './lib/utils.js';
 
 program
   .version('1.0.0')
@@ -34,6 +34,12 @@ async function main() {
 
     console.log(chalk.green('✓ Wrangler CLI found:'), chalk.gray(wranglerCheck.version));
 
+    // Get wrangler config info
+    const wranglerConfig = await getWranglerConfig();
+    if (wranglerConfig.kvNamespaces && wranglerConfig.kvNamespaces.length > 0) {
+      console.log(chalk.green('✓ KV namespaces found:'), chalk.gray(wranglerConfig.kvNamespaces.map(kv => kv.binding).join(', ')));
+    }
+
     let config;
     
     if (options.config) {
@@ -42,7 +48,7 @@ async function main() {
       process.exit(1);
     } else {
       // Interactive mode
-      config = await promptForConfig();
+      config = await promptForConfig(wranglerConfig);
     }
 
     // Validate configuration
@@ -75,12 +81,39 @@ async function main() {
   }
 }
 
-async function promptForConfig() {
+async function promptForConfig(wranglerConfig) {
   console.log(chalk.gray('Please provide your BigQuery configuration:\n'));
   console.log(chalk.yellow('ℹ️  This tool assumes you have a wrangler.jsonc file in the current directory'));
   console.log(chalk.yellow('   and are already authenticated with Cloudflare via wrangler login\n'));
 
+  const storageChoices = [
+    { name: 'Environment Variables (vars in wrangler.jsonc)', value: 'vars' },
+    { name: 'Secrets (using wrangler secret)', value: 'secrets' }
+  ];
+
+  // Add KV option if namespaces are available
+  if (wranglerConfig.kvNamespaces && wranglerConfig.kvNamespaces.length > 0) {
+    storageChoices.push({ name: 'KV Namespace', value: 'kv' });
+  }
+
   const answers = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'storageMethod',
+      message: 'How would you like to store the configuration?',
+      choices: storageChoices,
+      default: 'vars'
+    },
+    {
+      type: 'list',
+      name: 'kvNamespace',
+      message: 'Select KV namespace:',
+      choices: wranglerConfig.kvNamespaces ? wranglerConfig.kvNamespaces.map(kv => ({
+        name: `${kv.binding} (${kv.id})`,
+        value: kv.binding
+      })) : [],
+      when: (answers) => answers.storageMethod === 'kv'
+    },
     {
       type: 'input',
       name: 'projectId',
@@ -109,7 +142,7 @@ async function promptForConfig() {
     {
       type: 'confirm',
       name: 'confirmSetup',
-      message: 'Ready to set up environment variables and secrets?',
+      message: 'Ready to set up configuration?',
       default: true
     }
   ]);

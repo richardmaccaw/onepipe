@@ -18,3 +18,6 @@ test-config.json
 
 # Temporary files created by the tool
 .temp-service-account-key.json
+.temp-*.txt
+.temp-*.json
+.temp-kv-config.json

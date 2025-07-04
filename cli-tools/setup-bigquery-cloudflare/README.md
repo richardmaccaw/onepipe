@@ -1,14 +1,14 @@
 # BigQuery Wrangler Setup Tool
 
-A minimal CLI tool to help developers configure BigQuery destination settings using Cloudflare Wrangler CLI.
+A comprehensive CLI tool to configure BigQuery destination settings using Cloudflare Wrangler CLI with support for environment variables, secrets, and KV namespaces.
 
 ## Features
 
 - Interactive setup wizard
-- Uses Wrangler CLI for authentication
-- Securely stores service account key as Cloudflare secret
+- Multiple storage options for configuration
+- Uses Wrangler CLI for all operations
 - Validates BigQuery service account credentials
-- Provides wrangler.jsonc configuration snippets
+- Supports environment variables, secrets, and KV namespaces
 
 ## Prerequisites
 
@@ -16,6 +16,7 @@ A minimal CLI tool to help developers configure BigQuery destination settings us
 - Authenticated with Cloudflare via `wrangler login`
 - A Cloudflare Worker with `wrangler.jsonc` configuration file
 - BigQuery service account with appropriate permissions
+- (Optional) KV namespace configured in wrangler.jsonc
 
 ## Usage
 
@@ -45,31 +46,32 @@ cd /path/to/your/worker
 node /path/to/cli-tools/setup-bigquery-cloudflare/cli.js
 ```
 
-## Required Information
+## Storage Options
 
-You'll need the following information ready:
+The tool offers three ways to store your BigQuery configuration:
 
-**BigQuery:**
-- Project ID
-- Dataset ID
-- Service Account Key (JSON)
+### 1. Environment Variables (Recommended for non-sensitive data)
+- Stores project ID and dataset ID as environment variables in `wrangler.jsonc`
+- Service account key is always stored as a secret
+- Requires manual update to `wrangler.jsonc`
 
-## Configuration
+### 2. Secrets (Secure for all data)
+- Stores all configuration as Cloudflare secrets using `wrangler secret put`
+- Most secure option but requires more API calls
+- No manual configuration needed
 
-The tool will:
+### 3. KV Namespace (For dynamic configuration)
+- Stores all configuration in a KV namespace
+- Useful for multi-tenant or dynamic configurations
+- Requires a KV namespace to be configured in `wrangler.jsonc`
 
-1. **Set up a Cloudflare Secret:**
-   - `BIGQUERY_SERVICE_ACCOUNT_KEY` (automatically via wrangler)
+## Configuration Examples
 
-2. **Provide configuration for wrangler.jsonc:**
-   - `BIGQUERY_PROJECT_ID` (environment variable)
-   - `BIGQUERY_DATASET_ID` (environment variable)
+### Using Environment Variables
 
-### Example wrangler.jsonc configuration
+After running the tool with the "Environment Variables" option, add to your `wrangler.jsonc`:
 
-After running the tool, add the environment variables to your `wrangler.jsonc`:
-
-```json
+```jsonc
 {
   "name": "your-worker-name",
   "main": "src/index.js",
@@ -81,15 +83,56 @@ After running the tool, add the environment variables to your `wrangler.jsonc`:
 }
 ```
 
+Access in your worker:
+```javascript
+const projectId = env.BIGQUERY_PROJECT_ID;
+const datasetId = env.BIGQUERY_DATASET_ID;
+const serviceAccountKey = env.BIGQUERY_SERVICE_ACCOUNT_KEY; // From secret
+```
+
+### Using Secrets
+
+No manual configuration needed. Access in your worker:
+```javascript
+const projectId = env.BIGQUERY_PROJECT_ID;
+const datasetId = env.BIGQUERY_DATASET_ID;
+const serviceAccountKey = env.BIGQUERY_SERVICE_ACCOUNT_KEY;
+```
+
+### Using KV Namespace
+
+First, ensure you have a KV namespace in your `wrangler.jsonc`:
+```jsonc
+{
+  "kv_namespaces": [
+    {
+      "binding": "CONFIG_KV",
+      "id": "your-kv-namespace-id"
+    }
+  ]
+}
+```
+
+Access in your worker:
+```javascript
+const config = await env.CONFIG_KV.get('bigquery-config', 'json');
+// config.projectId
+// config.datasetId
+// config.serviceAccountKey
+```
+
 ## Security
 
-The BigQuery service account key is always stored as a Cloudflare secret using `wrangler secret put` to ensure proper security. Environment variables for project ID and dataset ID are non-sensitive and can be stored in the `vars` section of your wrangler.jsonc.
+- Service account keys are always stored securely (as secrets or encrypted in KV)
+- The tool uses temporary files that are automatically cleaned up
+- All sensitive operations use Wrangler's built-in security features
 
 ## Troubleshooting
 
 - **"Wrangler CLI is not installed"**: Install wrangler with `npm install -g wrangler`
 - **"wrangler.jsonc not found"**: Run the tool from your worker directory
 - **Authentication errors**: Run `wrangler login` first
+- **KV namespace errors**: Ensure your KV namespace is properly configured in wrangler.jsonc
 
 ## License
 

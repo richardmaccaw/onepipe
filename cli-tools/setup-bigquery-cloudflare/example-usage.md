@@ -24,72 +24,44 @@ cd /path/to/your/worker
 npx setup-bigquery-cloudflare
 ```
 
-## What you'll be prompted for:
+## Interactive Flow
 
-1. **BigQuery Project ID** - Your GCP project ID (not masked)
-2. **BigQuery Dataset ID** - Your BigQuery dataset name (not masked)
-3. **Service Account Key** - Opens an editor to paste your JSON key
-4. **Confirmation** - Confirm to proceed with setup
+The tool will prompt you for:
 
-## What the tool does:
+1. **Storage Method** - Choose how to store configuration:
+   - Environment Variables (vars in wrangler.jsonc)
+   - Secrets (using wrangler secret)
+   - KV Namespace (if available)
 
-1. ✅ Checks for wrangler installation
-2. ✅ Verifies wrangler.jsonc exists in current directory
-3. ✅ Validates your BigQuery service account key
-4. ✅ Stores service account key as a Cloudflare secret using `wrangler secret put`
-5. ✅ Provides configuration snippet for your wrangler.jsonc
+2. **KV Namespace** (if KV option selected) - Select from available namespaces
 
-## Manual steps after running:
+3. **BigQuery Project ID** - Your GCP project ID
 
-Add the environment variables to your `wrangler.jsonc`:
+4. **BigQuery Dataset ID** - Your BigQuery dataset name
 
-```jsonc
-{
-  "name": "bigquery-destination",
-  "main": "src/index.js",
-  "compatibility_date": "2024-01-01",
-  "vars": {
-    "BIGQUERY_PROJECT_ID": "my-gcp-project",
-    "BIGQUERY_DATASET_ID": "my_dataset",
-    // ... other vars
-  }
-}
-```
+5. **Service Account Key** - Opens editor to paste JSON key
 
-## Security Features
+6. **Confirmation** - Confirm to proceed with setup
 
-- Service account key is ALWAYS stored as a Cloudflare secret
-- Temporary files are automatically cleaned up
-- No sensitive data is logged to console
+## Example Outputs
 
-## Sample output
+### Option 1: Environment Variables
 
 ```
 🚀 BigQuery Wrangler Setup Tool
 
 ✓ Wrangler CLI found: ⛅️ wrangler 3.22.1
 
-Please provide your BigQuery configuration:
-
-ℹ️  This tool assumes you have a wrangler.jsonc file in the current directory
-   and are already authenticated with Cloudflare via wrangler login
-
+? How would you like to store the configuration? Environment Variables (vars in wrangler.jsonc)
 ? BigQuery Project ID: my-gcp-project
 ? BigQuery Dataset ID: analytics_dataset
 ? Paste your BigQuery Service Account Key JSON (opens editor): Received
-? Ready to set up environment variables and secrets? Yes
+? Ready to set up configuration? Yes
 
-🔍 Checking for wrangler configuration...
-✓ Found wrangler.jsonc
-
-📝 Setting environment variables...
-   Setting BIGQUERY_PROJECT_ID...
-   Note: BIGQUERY_PROJECT_ID should be added to your wrangler.jsonc vars section
-   Setting BIGQUERY_DATASET_ID...
-   Note: BIGQUERY_DATASET_ID should be added to your wrangler.jsonc vars section
+📝 Setting up with Environment Variables
 
 🔐 Setting service account key as secret...
-   Running: wrangler secret put BIGQUERY_SERVICE_ACCOUNT_KEY
+Running: wrangler secret put BIGQUERY_SERVICE_ACCOUNT_KEY
 ✓ Service account key stored as secret
 
 📋 Manual Configuration Required:
@@ -105,14 +77,121 @@ Add these environment variables to your wrangler.jsonc:
 }
 ────────────────────────────────────────────────────────────
 
-✅ Secret configuration complete!
+✅ Configuration complete!
+```
 
-The service account key has been stored as a Cloudflare secret.
-Don't forget to update your wrangler.jsonc with the environment variables above.
+### Option 2: Secrets
 
-✅ Setup complete!
+```
+🚀 BigQuery Wrangler Setup Tool
 
-Next steps:
-  1. Deploy your worker: wrangler deploy
-  2. Test the BigQuery connection
-  3. Start sending data to BigQuery
+✓ Wrangler CLI found: ⛅️ wrangler 3.22.1
+
+? How would you like to store the configuration? Secrets (using wrangler secret)
+? BigQuery Project ID: my-gcp-project
+? BigQuery Dataset ID: analytics_dataset
+? Paste your BigQuery Service Account Key JSON (opens editor): Received
+? Ready to set up configuration? Yes
+
+� Setting up with Secrets
+
+Setting secret BIGQUERY_PROJECT_ID...
+✓ Secret BIGQUERY_PROJECT_ID stored
+
+Setting secret BIGQUERY_DATASET_ID...
+✓ Secret BIGQUERY_DATASET_ID stored
+
+🔐 Setting service account key as secret...
+Running: wrangler secret put BIGQUERY_SERVICE_ACCOUNT_KEY
+✓ Service account key stored as secret
+
+✅ All configuration stored as secrets
+Access these in your worker using:
+  env.BIGQUERY_PROJECT_ID
+  env.BIGQUERY_DATASET_ID
+  env.BIGQUERY_SERVICE_ACCOUNT_KEY
+
+✅ Configuration complete!
+```
+
+### Option 3: KV Namespace
+
+```
+🚀 BigQuery Wrangler Setup Tool
+
+✓ Wrangler CLI found: ⛅️ wrangler 3.22.1
+✓ KV namespaces found: CONFIG_KV, CACHE_KV
+
+? How would you like to store the configuration? KV Namespace
+? Select KV namespace: CONFIG_KV (abc123def456)
+? BigQuery Project ID: my-gcp-project
+? BigQuery Dataset ID: analytics_dataset
+? Paste your BigQuery Service Account Key JSON (opens editor): Received
+? Ready to set up configuration? Yes
+
+📦 Setting up with KV Namespace: CONFIG_KV
+
+Storing configuration in KV namespace...
+Running: wrangler kv:key put
+✓ Configuration stored in KV namespace
+
+✅ Configuration stored in KV namespace
+Access this in your worker using:
+  const config = await env.CONFIG_KV.get('bigquery-config', 'json')
+
+✅ Configuration complete!
+```
+
+## Worker Code Examples
+
+### Accessing Environment Variables Configuration
+
+```javascript
+export default {
+  async fetch(request, env) {
+    const projectId = env.BIGQUERY_PROJECT_ID;
+    const datasetId = env.BIGQUERY_DATASET_ID;
+    const serviceAccountKey = env.BIGQUERY_SERVICE_ACCOUNT_KEY;
+    
+    // Use with BigQuery client...
+  }
+}
+```
+
+### Accessing Secrets Configuration
+
+```javascript
+export default {
+  async fetch(request, env) {
+    // Exactly the same as environment variables
+    const projectId = env.BIGQUERY_PROJECT_ID;
+    const datasetId = env.BIGQUERY_DATASET_ID;
+    const serviceAccountKey = env.BIGQUERY_SERVICE_ACCOUNT_KEY;
+    
+    // Use with BigQuery client...
+  }
+}
+```
+
+### Accessing KV Configuration
+
+```javascript
+export default {
+  async fetch(request, env) {
+    const config = await env.CONFIG_KV.get('bigquery-config', 'json');
+    
+    const projectId = config.projectId;
+    const datasetId = config.datasetId;
+    const serviceAccountKey = config.serviceAccountKey;
+    
+    // Use with BigQuery client...
+  }
+}
+```
+
+## Tips
+
+- Use **Environment Variables** for non-sensitive config that changes between environments
+- Use **Secrets** when you want everything secure and don't mind the extra API calls
+- Use **KV Namespace** for dynamic or multi-tenant configurations
+- Service account keys are always stored securely regardless of the option chosen
