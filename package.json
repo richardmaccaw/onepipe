@@ -11,7 +11,7 @@
     "build": "pnpm -r run build",
     "build:core": "pnpm --filter @onepipe/core run build",
     "build:destination-bigquery": "pnpm --filter @onepipe/destination-bigquery run build",
-    "setup:bigquery": "node setup-bigquery.js"
+    "setup:bigquery": "pnpm --filter @onepipe/destination-bigquery run setup"
   },
   "devDependencies": {
     "@types/lodash": "catalog:dev",

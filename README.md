@@ -44,26 +44,19 @@ OnePipe provides full Segment HTTP API compatibility:
 - Standardized `DestinationPlugin` interface
 - Support for multiple destinations simultaneously
 
-## BigQuery Setup
+## BigQuery Destination
 
-We provide a convenient setup tool to help you configure BigQuery as a destination:
+OnePipe includes a BigQuery destination plugin for sending events to Google BigQuery with automatic table creation and schema management.
+
+### Quick Setup
 
 ```bash
 pnpm run setup:bigquery
 ```
 
-This interactive CLI tool will:
+This will launch an interactive setup tool from the [@onepipe/destination-bigquery](./packages/destination-bigquery) package.
 
-- Guide you through entering your BigQuery project ID and dataset ID
-- Upload your Google Cloud service account credentials to Cloudflare Secrets
-- Store project/dataset IDs in Cloudflare KV metadata (non-sensitive configuration)
-- Update your `onepipe-configuration.json` automatically
-
-**Requirements:**
-- A Google Cloud project with BigQuery enabled
-- A service account with BigQuery Data Editor permissions
-- The service account JSON key file downloaded locally
-- `wrangler` CLI authenticated (`wrangler auth login`)
+For detailed setup instructions, troubleshooting, and manual configuration options, see the [BigQuery destination documentation](./packages/destination-bigquery/README.md).
 
 ## Development
 

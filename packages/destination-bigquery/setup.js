@@ -3,6 +3,11 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { execSync } from 'child_process';
 import readline from 'readline';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const KV_BINDING = "KV_BINDING"; // Hardcoded from wrangler.jsonc
 
@@ -11,7 +16,7 @@ if (process.argv.includes('--help') || process.argv.includes('-h')) {
   console.log(`
 🚀 OnePipe BigQuery Setup Tool
 
-Usage: node setup-bigquery.js [options]
+Usage: node setup.js [options]
 
 This interactive tool helps you configure BigQuery for your OnePipe instance.
 
@@ -31,8 +36,8 @@ Requirements:
 • wrangler CLI authenticated (run: wrangler auth login)
 
 Example:
-  pnpm run setup:bigquery
-  node setup-bigquery.js
+  pnpm --filter @onepipe/destination-bigquery run setup
+  cd packages/destination-bigquery && node setup.js
 `);
   process.exit(0);
 }
@@ -152,7 +157,8 @@ async function main() {
     console.log('\n📝 Updating onepipe-configuration.json...');
     
     try {
-      const configPath = './onepipe-configuration.json';
+      // Find the workspace root (go up two levels from packages/destination-bigquery)
+      const configPath = resolve(__dirname, '../../onepipe-configuration.json');
       const config = JSON.parse(readFileSync(configPath, 'utf8'));
       
       // Check if bigquery destination already exists
@@ -174,6 +180,7 @@ async function main() {
       
     } catch (error) {
       console.log('  ⚠️  Could not update configuration file. You may need to manually add the BigQuery destination.');
+      console.log('     Make sure you\'re running this from the workspace root or the packages/destination-bigquery directory.');
     }
 
     // Step 6: Display summary
