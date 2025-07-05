@@ -3,9 +3,6 @@
 # dependencies
 node_modules
 
-# testing
-/coverage
-
 # production
 /build
 dist/
@@ -34,6 +31,7 @@ packages/*/dist/
 
 # Cursor
 cursor/
+claude/
 
 # Environment files
 .env
