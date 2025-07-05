@@ -5,28 +5,21 @@
   "private": true,
   "scripts": {
     "deploy": "wrangler deploy",
-    "dev": "wrangler dev",
-    "check:types": "tsc --noEmit",
-    "cf-typegen": "wrangler types",
-    "build": "pnpm -r run build",
-    "build:core": "pnpm --filter @onepipe/core run build",
-    "build:destination-bigquery": "pnpm --filter @onepipe/destination-bigquery run build"
+    "dev": "wrangler dev"
   },
   "devDependencies": {
-    "@types/lodash": "catalog:dev",
-    "@types/uuid": "catalog:dev",
-    "typescript": "catalog:dev",
-    "wrangler": "catalog:dev"
+    "@types/lodash": "^4.17.19",
+    "@types/uuid": "^10.0.0",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.22.0"
   },
   "dependencies": {
-    "@hono/zod-validator": "catalog:",
-    "@maccman/web-auth-library": "catalog:",
-    "@onepipe/core": "workspace:*",
-    "@onepipe/destination-bigquery": "workspace:*",
-    "hono": "catalog:",
-    "lodash": "catalog:",
-    "uuid": "catalog:",
-    "web-auth-library": "catalog:",
-    "zod": "catalog:"
+    "@hono/zod-validator": "^0.7.0",
+    "@maccman/web-auth-library": "^1.0.5",
+    "hono": "^4.8.3",
+    "lodash": "^4.17.21",
+    "uuid": "^11.1.0",
+    "web-auth-library": "^1.0.3",
+    "zod": "^3.25.67"
   }
 }
