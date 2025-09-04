@@ -13,8 +13,8 @@ catalogs:
       specifier: ^1.0.5
       version: 1.0.5
     hono:
-      specifier: ^4.8.3
-      version: 4.8.3
+      specifier: ^4.9.6
+      version: 4.9.6
     lodash:
       specifier: ^4.17.21
       version: 4.17.21
@@ -47,7 +47,7 @@ importers:
     dependencies:
       '@hono/zod-validator':
         specifier: 'catalog:'
-        version: 0.7.0(hono@4.8.3)(zod@3.25.67)
+        version: 0.7.0(hono@4.9.6)(zod@3.25.67)
       '@maccman/web-auth-library':
         specifier: 'catalog:'
         version: 1.0.5
@@ -59,7 +59,7 @@ importers:
         version: link:packages/destination-bigquery
       hono:
         specifier: 'catalog:'
-        version: 4.8.3
+        version: 4.9.6
       lodash:
         specifier: 'catalog:'
         version: 4.17.21
@@ -520,8 +520,8 @@ packages:
   glob-to-regexp@0.4.1:
     resolution: {integrity: sha512-lkX1HJXwyMcprw/5YUZc2s7DrpAiHB21/V+E1rHUrVNokkvB6bqMzT0VfV6/86ZNabt1k14YOIaT7nDvOX3Iiw==}
 
-  hono@4.8.3:
-    resolution: {integrity: sha512-jYZ6ZtfWjzBdh8H/0CIFfCBHaFL75k+KMzaM177hrWWm2TWL39YMYaJgB74uK/niRc866NMlH9B8uCvIo284WQ==}
+  hono@4.9.6:
+    resolution: {integrity: sha512-doVjXhSFvYZ7y0dNokjwwSahcrAfdz+/BCLvAMa/vHLzjj8+CFyV5xteThGUsKdkaasgN+gF2mUxao+SGLpUeA==}
     engines: {node: '>=16.9.0'}
 
   is-arrayish@0.3.2:
@@ -762,9 +762,9 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@hono/zod-validator@0.7.0(hono@4.8.3)(zod@3.25.67)':
+  '@hono/zod-validator@0.7.0(hono@4.9.6)(zod@3.25.67)':
     dependencies:
-      hono: 4.8.3
+      hono: 4.9.6
       zod: 3.25.67
 
   '@img/sharp-darwin-arm64@0.33.5':
@@ -936,7 +936,7 @@ snapshots:
 
   glob-to-regexp@0.4.1: {}
 
-  hono@4.8.3: {}
+  hono@4.9.6: {}
 
   is-arrayish@0.3.2: {}
 
