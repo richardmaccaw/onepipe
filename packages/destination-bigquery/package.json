@@ -6,12 +6,14 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "setup.js"
   ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "setup": "node setup.js"
   },
   "dependencies": {
     "@maccman/web-auth-library": "catalog:",

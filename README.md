@@ -44,6 +44,20 @@ OnePipe provides full Segment HTTP API compatibility:
 - Standardized `DestinationPlugin` interface
 - Support for multiple destinations simultaneously
 
+## BigQuery Destination
+
+OnePipe includes a BigQuery destination plugin for sending events to Google BigQuery with automatic table creation and schema management.
+
+### Quick Setup
+
+```bash
+pnpm run setup:bigquery
+```
+
+This will launch an interactive setup tool from the [@onepipe/destination-bigquery](./packages/destination-bigquery) package.
+
+For detailed setup instructions, troubleshooting, and manual configuration options, see the [BigQuery destination documentation](./packages/destination-bigquery/README.md).
+
 ## Development
 
 ### Commands
